@@ -5,7 +5,6 @@ const nodeExternals = require('webpack-node-externals');
 const common = {
   target: 'node',
   node: false,
-  entry: './src/server.ts',
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js'

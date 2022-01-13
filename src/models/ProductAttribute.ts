@@ -1,8 +1,6 @@
-import { Model } from 'objection';
-
-import Product, { ProductShape } from './Product';
-import Attribute, { AttributeShape } from './Attribute';
-import ProductAttributeSource, { ProductAttributeSourceShape } from './ProductAttributeSource';
+import { ProductShape } from './Product';
+import { AttributeShape } from './Attribute';
+import { ProductAttributeSourceShape } from './ProductAttributeSource';
 import { DeepPartial } from '../utils/types';
 
 export interface ProductAttributeShape {
@@ -19,60 +17,4 @@ export interface ProductAttributeShape {
 	sources?: ProductAttributeSourceShape[];
 }
 
-interface ProductAttribute extends Omit<ProductAttributeShape, 'product' | 'attribute' | 'sources'> {
-	product?: Product;
-	attribute?: Attribute;
-	sources?: ProductAttributeSource[];
-}
-// eslint-disable-next-line no-redeclare
-class ProductAttribute extends Model {
-	static get tableName() {
-		return 'ProductAttribute';
-	}
-
-	static get jsonSchema() {
-		return {
-			type: 'object',
-
-			properties: {
-				id: {type: 'integer'},
-				value: {type: 'float'},
-				unit: {type: 'string'},
-				type: {type: 'string'}
-			}
-		}
-  }
-  
-  static get relationMappings() {
-		return {
-			product: {
-				relation: Model.BelongsToOneRelation,
-				modelClass: Product,
-				join: {
-					from: 'ProductAttribute.productId',
-					to: 'Product.id'
-				}
-			},
-			attribute: {
-				relation: Model.BelongsToOneRelation,
-				modelClass: Attribute,
-				join: {
-					from: 'ProductAttribute.attributeId',
-					to: 'Attribute.id'
-				}
-			},
-			sources: {
-				relation: Model.HasManyRelation,
-				modelClass: ProductAttributeSource,
-				join: {
-					from: 'ProductAttribute.id',
-					to: 'ProductAttributeSource.attributeId'
-				}
-			},
-    }
-  }
-}
-
 export type ProductAttributePartialShape = DeepPartial<ProductAttributeShape>;
-
-export default ProductAttribute;
