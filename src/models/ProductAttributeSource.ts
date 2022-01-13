@@ -1,7 +1,7 @@
-import { ProductAttributeShape } from './ProductAttribute';
-import { SourceShape } from './Source';
+import ProductAttributeShape from './ProductAttribute';
+import SourceShape from './Source';
 
-export interface ProductAttributeSourceShape {
+export default interface ProductAttributeSourceShape {
 	id: number;
 
 	referenceUrl?: string;

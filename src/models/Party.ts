@@ -1,6 +1,6 @@
-import { TransactionShape } from "./Transaction";
+import TransactionShape from "./Transaction";
 
-export interface PartyShape {
+export default interface PartyShape {
 	id: number;
 
 	name?: string;

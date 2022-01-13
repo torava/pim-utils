@@ -1,6 +1,6 @@
-import { TransactionShape } from './Transaction';
+import TransactionShape from './Transaction';
 
-export interface GroupShape {
+export default interface GroupShape {
 	name: string;
 	transactions?: TransactionShape;
 }

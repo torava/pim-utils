@@ -1,4 +1,4 @@
-import { AttributeShape } from "../models/Attribute";
+import AttributeShape from "../models/Attribute";
 import { CategoryAttributePartialShape } from "../models/CategoryAttribute";
 import { ProductAttributePartialShape } from "../models/ProductAttribute";
 import { convertMeasure } from "./entities";

@@ -1,4 +1,6 @@
-export interface ReceiptShape {
+import TransactionShape from './Transaction';
+
+export default interface ReceiptShape {
 	id: number;
 
 	file?: string;

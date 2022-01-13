@@ -1,12 +1,12 @@
-import { ItemShape } from './Item';
-import { ProductAttributeShape } from './ProductAttribute';
-import { CategoryShape } from './Category';
-import { ManufacturerShape } from './Manufacturer';
-import { ProductContributionShape } from './ProductContribution';
-import { BrandShape } from './Brand';
+import ItemShape from './Item';
+import ProductAttributeShape from './ProductAttribute';
+import CategoryShape from './Category';
+import ManufacturerShape from './Manufacturer';
+import ProductContributionShape from './ProductContribution';
+import BrandShape from './Brand';
 import { DeepPartial } from '../utils/types';
 
-export interface ProductShape {
+export default interface ProductShape {
 	id: number;
 	name: string;
 

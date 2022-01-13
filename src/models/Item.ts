@@ -1,7 +1,7 @@
-import { TransactionShape } from './Transaction';
-import { ProductShape } from './Product';
+import TransactionShape from './Transaction';
+import ProductShape from './Product';
 
-export interface ItemShape {
+export default interface ItemShape {
 	id: number;
 
 	itemNumber?: string;

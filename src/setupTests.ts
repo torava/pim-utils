@@ -1,6 +1,6 @@
-import { AttributeShape } from "./models/Attribute";
-import { CategoryShape } from "./models/Category";
-import { ProductShape } from "./models/Product";
+import AttributeShape from "./models/Attribute";
+import CategoryShape from "./models/Category";
+import ProductShape from "./models/Product";
 
 export const toArrayBuffer = (buffer: Buffer) => {
   const arrayBuffer = new ArrayBuffer(buffer.length);

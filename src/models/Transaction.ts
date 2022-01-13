@@ -1,9 +1,9 @@
-import { PartyShape } from './Party';
-import { ReceiptShape } from './Receipt';
-import { ItemShape } from './Item';
-import { GroupShape } from './Group';
+import PartyShape from './Party';
+import ReceiptShape from './Receipt';
+import ItemShape from './Item';
+import GroupShape from './Group';
 
-export interface TransactionShape {
+export default interface TransactionShape {
 	id: number;
 
 	totalPrice?: number;

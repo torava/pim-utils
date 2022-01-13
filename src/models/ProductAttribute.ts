@@ -1,9 +1,9 @@
-import { ProductShape } from './Product';
-import { AttributeShape } from './Attribute';
-import { ProductAttributeSourceShape } from './ProductAttributeSource';
+import ProductShape from './Product';
+import AttributeShape from './Attribute';
+import ProductAttributeSourceShape from './ProductAttributeSource';
 import { DeepPartial } from '../utils/types';
 
-export interface ProductAttributeShape {
+export default interface ProductAttributeShape {
 	id: number;
 	
 	value?: number;

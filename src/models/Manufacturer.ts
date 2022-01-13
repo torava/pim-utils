@@ -1,4 +1,4 @@
-export interface ManufacturerShape {
+export default interface ManufacturerShape {
 	id: number;
 
 	name?: string;

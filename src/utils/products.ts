@@ -1,18 +1,14 @@
-import moment from "moment";
-import stringSimilarity from "string-similarity-js";
-
-import { stripDetails, stripName } from "./transactions";
-import Category, { CategoryShape } from "../models/Category";
-import Manufacturer from "../models/Manufacturer";
-import Product, { ProductPartialShape, ProductShape } from "../models/Product";
+import { stripDetails } from "./transactions";
+import CategoryShape from "../models/Category";
+import ProductShape, { ProductPartialShape } from "../models/Product";
 import { getAttributeValues, getMaxAttributeValue, getMinAttributeValue } from "./attributes";
 import { getCategoriesWithAttributes } from "./categories";
 import { convertMeasure } from "./entities";
 import { LevenshteinDistance } from './levenshteinDistance';
-import { AttributeShape } from "../models/Attribute";
-import { CategoryContributionShape } from "../models/CategoryContribution";
+import AttributeShape from "../models/Attribute";
+import CategoryContributionShape from "../models/CategoryContribution";
 import { ProductAttributePartialShape } from "../models/ProductAttribute";
-import { NameTranslations, ObjectEntries, Token } from "./types";
+import { Token } from "./types";
 import { ProductContributionPartialShape } from "../models/ProductContribution";
 
 export const getProductCategoryMinMaxAttributes = (
@@ -156,8 +152,8 @@ export const resolveProductAttributes = (
   return {productAttributes, measure};
 };
 
-export const getClosestProduct = (name: Product['name'], products: Product[]): [
-  Product?,
+export const getClosestProduct = (name: ProductShape['name'], products: ProductShape[]): [
+  ProductShape?,
   Token?
 ] => {
   if (!name) return [undefined, undefined];
@@ -165,7 +161,7 @@ export const getClosestProduct = (name: Product['name'], products: Product[]): [
   const strippedName = stripDetails(name);
 
   let bestToken: Token,
-      bestProduct: Product;
+      bestProduct: ProductShape;
 
   products.forEach((product) => {
     const {aliases} = product;
@@ -199,74 +195,4 @@ export const getClosestProduct = (name: Product['name'], products: Product[]): [
     'token', bestToken
   );
   return bestToken?.substring.length ? [bestProduct, bestToken] : [undefined, undefined];
-};
-
-export const getProductsFromOpenFoodFactsRecords = async (records: {
-  quantity: string,
-  brands: string,
-  product_name: string
-}[]) => {
-  const categories = (await Category.query().withGraphFetched('attributes')) as (Category & {strippedName?: NameTranslations})[];
-  const manufacturers = await Manufacturer.query();
-
-  const strippedCategories = categories.filter(category => (
-    category.attributes?.length ? true : false
-  )).map(category => {
-    const name = category.name;
-    category.strippedName = stripName(name, manufacturers);
-    return category;
-  });
-
-  let n = 0;
-
-  for (const record of records) {
-    const {
-      quantity,
-      brands,
-      product_name
-    } = record;
-    const measureMatch = quantity.match(/([0-9]+)\s?([m|k]?[g|l])/);
-    const measure = Number(measureMatch?.[1]);
-    const unit = measureMatch?.[2];
-    if (measure && unit && product_name !== '') {
-
-      const brand = brands.split(',')[0];
-
-      const productNameWithBrand = `${brand} ${product_name}`;
-      const strippedProductName = stripDetails(product_name);
-
-      let bestDistance = 0.4,
-          categoryId;
-      strippedCategories.forEach((category) => {
-        ObjectEntries(category.strippedName).forEach(([locale, translation]) => {
-          if (translation) {
-            let distance = stringSimilarity(strippedProductName.toLowerCase() || '', translation.toLowerCase() || '');
-            distance = Math.max(distance, stringSimilarity(productNameWithBrand.toLowerCase() || '', category.name[locale].toLowerCase() || '')+0.1);
-            category.aliases?.forEach(alias => {
-              distance = Math.max(distance, stringSimilarity(strippedProductName.toLowerCase() || '', alias.toLowerCase() || '')+0.1);
-              distance = Math.max(distance, stringSimilarity(productNameWithBrand.toLowerCase() || '', alias.toLowerCase() || '')+0.1);
-            });
-            if (category.parent) {
-              distance = Math.max(distance, stringSimilarity(strippedProductName || '', category.parent.name[locale] || ''));
-            }
-
-            if (distance > bestDistance) {
-              bestDistance = distance;
-              categoryId = category.id;
-            }
-          }
-        });
-      });
-
-      await Product.query().insert({
-        name: productNameWithBrand,
-        measure,
-        unit,
-        categoryId
-      });
-      n++;
-    }
-  }
-
-  console.log('added', n, 'products', moment().format());
 };

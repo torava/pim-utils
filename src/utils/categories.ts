@@ -1,18 +1,16 @@
 import moment from 'moment';
-import _ from 'lodash';
 
-import Attribute, { AttributeShape } from '../models/Attribute';
-import Category, { CategoryPartialShape, CategoryShape } from '../models/Category';
-import Manufacturer, { ManufacturerShape } from '../models/Manufacturer';
-import Source, { SourcePartialShape } from '../models/Source';
+import AttributeShape from '../models/Attribute';
+import CategoryShape, { CategoryPartialShape } from '../models/Category';
+import ManufacturerShape from '../models/Manufacturer';
 import { convertMeasure } from './entities';
 import { getTranslation } from '../utils/entities';
 import { stripName, stripDetails, getDetails } from './transactions';
 import { LevenshteinDistance } from './levenshteinDistance';
 import { measureRegExp } from './receipts';
-import CategoryAttribute, { CategoryAttributePartialShape, CategoryAttributeShape } from '../models/CategoryAttribute';
+import CategoryAttributeShape, { CategoryAttributePartialShape } from '../models/CategoryAttribute';
 import { Locale, NameTranslations, ObjectEntries, Token } from './types';
-import { CategoryContributionPartialShape, CategoryContributionShape } from '../models/CategoryContribution';
+import CategoryContributionShape, { CategoryContributionPartialShape } from '../models/CategoryContribution';
 import { getAttributeValues, getMaxAttributeValue, getMinAttributeValue } from './attributes';
 
 export const getAverageRate = (filter: {start_date: string, end_date: string}, averageRange: number) => {
@@ -22,7 +20,7 @@ export const getAverageRate = (filter: {start_date: string, end_date: string}, a
   return rate;
 };
 
-export const aggregateCategoryPrice = (resolvedCategories: (Category & {
+export const aggregateCategoryPrice = (resolvedCategories: (CategoryShape & {
   price_sum: number,
   weight_sum: number,
   volume_sum: number
@@ -133,10 +131,10 @@ export const getCategoriesWithAttributes = (
   return results;
 };
 
-export function resolveCategories(items: Category[], locale: Locale) {
+export function resolveCategories(items: CategoryShape[], locale: Locale) {
   if (!locale) return;
-  let itemAttributes: CategoryAttribute[],
-      resolvedAttributes: {[key: CategoryAttribute['id']]: CategoryAttribute},
+  let itemAttributes: CategoryAttributeShape[],
+      resolvedAttributes: {[key: CategoryAttributeShape['id']]: CategoryAttributeShape},
       item;
   for (let i in items) {
     item = items[i];
@@ -168,7 +166,7 @@ export function resolveCategories(items: Category[], locale: Locale) {
   }
 }
 
-export function resolveCategoryPrices(categories: (Category & {
+export function resolveCategoryPrices(categories: (CategoryShape & {
   price_sum: number
 })[]) {
   categories && categories.reduce(function resolver(sum, category) {
@@ -341,191 +339,12 @@ export const getContributionsFromList = (
   return contributions;
 };
 
-export const getCategoriesFromCsv = async (records: {[key: string]: string}[], sourceRecords: {[key: string]: string}[]) => {
-  try {
-    let item: CategoryPartialShape,
-        found,
-        attribute,
-        note,
-        attributes = await Attribute.query(),
-        categories = await Category.query(),
-        sourceRecordIdMap: {[key: string]: SourcePartialShape} = {},
-        attributeObject,
-        value;
-
-    for (const columns of records) {
-      item = {};
-      note = '';
-      for (const [columnName, column] of ObjectEntries(columns)) {
-        if (columnName !== '' && column !== '') {
-          attribute = columnName.match(/^attribute:(.*)(\s\((.*)\))/i) ||
-                      columnName.match(/^attribute:(.*)/i);
-          let nameMatch = columnName.match(/^(name|nimi)\["([a-z-]+)"\]$/i),
-              name,
-              locale;
-          if (nameMatch) {
-            name = nameMatch[1];
-            locale = nameMatch[2] as Locale;
-          }
-          if (attribute) {
-            found = false;
-            for (let m in attributes) {
-              if (Object.values(attributes[m].name).includes(attribute[1])) {
-                attributeObject = {
-                  id: attributes[m].id
-                }
-                found = true;
-                break;
-              }
-            }
-            if (!found) {
-              attributeObject = {
-                name: {
-                  'fi-FI': attribute[1],
-                  'en-US': attribute[1]
-                }
-              };
-            }
-            value = parseFloat(column.replace(',', '.'));
-            item = {
-              ...item || {},
-              attributes: [
-                ...item.attributes || [],
-                {
-                  attribute: attributeObject,
-                  value,
-                  unit: attribute[3]
-                }
-              ]
-            };
-          } else if (columnName.toLowerCase() === 'note') {
-            note = column;
-          } else if (columnName.toLowerCase() === 'sourceid') {
-            const sourceRecord = sourceRecords.find(source => source.id === column);
-            if (sourceRecord) {
-              let source = sourceRecordIdMap[sourceRecord.id];
-              if (!source) {
-                const sourceRecordWithoutId: SourcePartialShape = {...sourceRecord};
-                delete sourceRecordWithoutId.id;
-                try {
-                  source = await Source.query().insertAndFetch(sourceRecordWithoutId).returning('*');
-                  sourceRecordIdMap[sourceRecord.id] = {id: source.id};
-                } catch (error) {
-                  console.error('Error while adding source', sourceRecord);
-                }
-              }
-              
-              for (const m in item.attributes) {
-                if (!item.attributes[m].sources) {
-                  item.attributes[m].sources = [];
-                }
-                item.attributes[m].sources.push({
-                  source,
-                  note
-                });
-              }
-            } else {
-              console.error('Source not found for id', column);
-            }
-          } else if (name && locale) {
-            if (!item.id) {
-              for (const i in categories) {
-                if (categories[i].name?.[locale] && categories[i].name[locale].toLowerCase().trim() === column?.toLowerCase().trim()) {
-                  item.id = categories[i].id;
-                  delete item.name;
-                  break;
-                }
-              }
-              if (!item.id) {
-                if (!item.name) item.name = {};
-                item.name[locale] = column;
-              }
-            }
-          } else if (columnName.toLowerCase() === 'aliases') {
-            try {
-              const aliases = JSON.parse(column);
-              if (aliases) {
-                _.set(item, columnName, aliases);
-              }
-            } catch (error) {
-              console.error('Aliases parse error', column, error);
-            }
-          } else if (['parent'].indexOf(columnName.toLowerCase()) === -1) {
-            _.set(item, columnName, column);
-          }
-        }
-      }
-      await Category.query().upsertGraph(item as Category, {
-        noDelete: true,
-        relate: true
-      });
-      categories = await Category.query();
-      attributes = await Attribute.query();
-    }
-    console.log(`read ${records.length} records`);
-    //console.dir(items, {depth: null, maxArrayLength: null});
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-export const getCategoryParentsFromCsv = async (records: {[key: string]: string}[]) => {
-  try {
-    let items: CategoryPartialShape[] = [],
-        item: CategoryPartialShape,
-        categories = await Category.query();
-
-    records.forEach(columns => {
-      item = {};
-      Object.entries(columns).forEach(([columnName, column]) => {
-        let nameMatch = columnName.match(/^(name|nimi)\["([a-z-]+)"\]$/i),
-            name,
-            locale;
-        if (nameMatch) {
-          name = nameMatch[1];
-          locale = nameMatch[2] as Locale;
-        }
-        if (name && locale) {
-          if (column === '') return true;
-          if (!item.id) {
-            for (let i in categories) {
-              if (categories[i].name?.[locale] && categories[i].name[locale].toLowerCase().trim() === column?.toLowerCase().trim()) {
-                item.id = categories[i].id;
-                break;
-              }
-            }
-          }
-        }
-        else if (['parent'].indexOf(columnName.toLowerCase()) !== -1) {
-          if (column === '') return true;
-          for (let i in categories) {
-            if (categories[i].name && Object.values(categories[i].name).some(category => category.toLowerCase().trim() === column.toLowerCase().trim())) {
-              item.parent = {
-                id: categories[i].id
-              }
-              break;
-            }
-          }
-        }
-      });
-      if (item.parent) {
-        items.push(item);
-      }
-    });
-    console.log(`read ${records.length} records and found ${items.length} category parents`);
-    //console.dir(items, {depth: null, maxArrayLength: null});
-    return items;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-export const getStrippedChildCategories = async () => {
-  const categories = (await Category.query()
-  .withGraphFetched('[contributions, children, attributes]'));
+export const getStrippedChildCategories = async (categories: CategoryShape[] = [], manufacturers: ManufacturerShape[] = []) => {
+  //const categories = (await CategoryShape.query()
+  //.withGraphFetched('[contributions, children, attributes]'));
 
   const childCategories = categories.filter(category => !category.children?.length);
-  const manufacturers = await Manufacturer.query();
+  //const manufacturers = await ManufacturerShape.query();
   const strippedCategories = getStrippedCategories(childCategories, manufacturers);
 
   return strippedCategories;

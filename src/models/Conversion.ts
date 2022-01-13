@@ -1,4 +1,4 @@
-export interface ConversionShape {
+export default interface ConversionShape {
 	id: number;
 
 	fromLocale?: string;

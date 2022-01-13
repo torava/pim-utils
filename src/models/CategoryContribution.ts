@@ -1,7 +1,7 @@
 import { DeepPartial } from '../utils/types';
-import { CategoryShape } from './Category';
+import CategoryShape from './Category';
 
-export interface CategoryContributionShape {
+export default interface CategoryContributionShape {
 	id: number;
 
 	amount?: number;

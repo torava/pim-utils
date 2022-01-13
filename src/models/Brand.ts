@@ -1,4 +1,4 @@
-export interface BrandShape {
+export default interface BrandShape {
 	id: number;
 
 	name?: string;
