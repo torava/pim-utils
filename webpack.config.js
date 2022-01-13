@@ -1,10 +1,12 @@
 const path = require('path');
 const { merge } = require('webpack-merge');
 const nodeExternals = require('webpack-node-externals');
+const entry = require('webpack-glob-entry');
 
 const common = {
   target: 'node',
   node: false,
+  entry: entry('./src/*.ts', './src/*.js'),
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js'
