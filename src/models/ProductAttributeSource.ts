@@ -10,5 +10,7 @@ export default interface ProductAttributeSourceShape {
 	countryCode?: string;
 
 	attribute?: ProductAttributeShape;
+	attributeId?: ProductAttributeShape['id'];
 	source?: SourceShape;
+	sourceId?: SourceShape['id'];
 }

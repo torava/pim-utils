@@ -8,4 +8,5 @@ export default interface ReceiptShape {
 	text?: string;
 
 	transaction?: TransactionShape;
+	transactionId?: TransactionShape['id'];
 }

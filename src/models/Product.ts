@@ -24,6 +24,7 @@ export default interface ProductShape {
 	manufacturer?: ManufacturerShape;
 	manufacturerId?: ManufacturerShape['id'];
 	brand?: BrandShape;
+	brandId?: BrandShape['id'];
 	contributions?: ProductContributionShape[];
 }
 

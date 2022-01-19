@@ -11,6 +11,7 @@ export default interface TransactionShape {
 	date?: string;
 
 	party?: PartyShape;
+	partyId?: PartyShape['id'];
 	group?: GroupShape;
 	receipts?: ReceiptShape[];
 	items?: ItemShape[];

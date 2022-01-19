@@ -13,5 +13,7 @@ export default interface ItemShape {
 	unit?: string;
 
 	transaction?: TransactionShape;
+	transactionId?: TransactionShape['id'];
 	product?: ProductShape;
+	productId?: ProductShape['id'];
 }

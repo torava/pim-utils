@@ -7,4 +7,5 @@ export default interface ManufacturerShape {
 	headquartersLocation?: string[];
 
 	parent?: ManufacturerShape;
+	parentId?: ManufacturerShape['id'];
 }

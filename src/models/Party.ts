@@ -13,4 +13,5 @@ export default interface PartyShape {
 	email?: string;
 
 	transaction?: TransactionShape;
+	transactionId?: TransactionShape['id'];
 }

@@ -7,4 +7,5 @@ export default interface BrandShape {
 	headquartersLocation?: string;
 
 	parent?: BrandShape;
+	parentId?: BrandShape['id'];
 }
