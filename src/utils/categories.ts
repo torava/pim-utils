@@ -424,9 +424,9 @@ export const resolveCategoryAttributes = (
         unit,
         initialProductAttributes = category.attributes?.filter(productAttribute => productAttribute.attributeId === attributeId);
     
-    category.contributions?.forEach(productContribution => {
-      const contribution = categories.find(category => category.id === productContribution.contributionId);
-      const result = getCategoryMinMaxAttributes(contribution, productContribution, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
+    category.contributions?.forEach(categoryContribution => {
+      const contribution = categories.find(category => category.id === categoryContribution.contributionId);
+      const result = getCategoryMinMaxAttributes(contribution, categoryContribution, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
       if (result?.minCategoryAttribute) {
         const {minAttributeValue, minCategoryAttribute, maxAttributeValue} = result;
         minValue+= minAttributeValue || 0;
@@ -469,15 +469,15 @@ export const resolveCategoryAttributes = (
   });
 
   if (foodUnitAttribute) {   
-    measure = category.contributions?.reduce((total, productContribution) => {
-      const contribution = categories.find(category => category.id === productContribution.contributionId);
-      const portionAttribute = contribution.attributes.find(a => a.attributeId === foodUnitAttribute.id);
-      return total+convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
-    }, 0);
-
-    if (category) {
+    if (category.attributes) {
       const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
       measure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
+    } else {
+      measure = category.contributions?.reduce((total, productContribution) => {
+        const contribution = categories.find(category => category.id === productContribution.contributionId);
+        const portionAttribute = contribution.attributes.find(a => a.attributeId === foodUnitAttribute.id);
+        return total+convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
+      }, 0);
     }
   }
 
