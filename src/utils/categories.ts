@@ -297,7 +297,7 @@ export const getContributionsFromList = (
       contribution: contributionContribution,
       contributionId: contributionContribution?.id
     };
-    if (contribution) {
+    if (contribution.contribution) {
       if (foodUnitAttribute) {
         const {value, unit} = contribution.contribution.attributes.find(attribute => attribute.attributeId === foodUnitAttribute.id) || {};
         if (value) {
@@ -332,7 +332,7 @@ export const getContributionsFromList = (
           }
         }
       }
-    } else if (contribution) {
+    } else if (contribution.contribution) {
       contributions.push(contribution);
     }
   });
