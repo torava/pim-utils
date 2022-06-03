@@ -1,7 +1,8 @@
+import Attribute from "../models/Attribute";
 import AttributeShape from "../models/Attribute";
 import { CategoryAttributePartialShape } from "../models/CategoryAttribute";
 import { ProductAttributePartialShape } from "../models/ProductAttribute";
-import { convertMeasure } from "./entities";
+import { convertMeasure, getLeafIds } from "./entities";
 
 export const getAttributeValues = (
   unit: CategoryAttributePartialShape['unit'],
@@ -41,3 +42,29 @@ export const getMinAttributeValue = (attributeResult: [number, CategoryAttribute
 export const getMaxAttributeValue = (attributeResult: [number, CategoryAttributePartialShape][]): [number?, CategoryAttributePartialShape?] => (
   attributeResult.reduce((a, b) => a[0] > b[0] ? a : b) || [undefined, undefined]
 );
+
+export const getAttributeIdsFromCodes = (attributeCodes?: string, attributes: AttributeShape[] = []) => {
+  let attributeIds: number[] = [];
+  attributeCodes?.split(',').forEach(code => {
+    const id = attributes.find(attribute => attribute.code === code)?.id;
+    if (id) {
+      let ids: Attribute['id'][] = [];
+      getLeafIds(attributes, id, ids);
+      if (ids.length) {
+        attributeIds = attributeIds.concat(ids);
+      } else {
+        attributeIds.push(id);
+      }
+    }
+  });
+  return attributeIds;
+};
+
+export const getFoodUnitAttributeByCode = (code?: string, attributes: AttributeShape[] = []) => {
+  if (code) {
+    const foodUnitParentAttribute = attributes.find(a => a.name['en-US'] === 'Food units');
+    return attributes.find(attribute => (
+      attribute.code === code && attribute.parentId === foodUnitParentAttribute.id
+    ));
+  }
+};
