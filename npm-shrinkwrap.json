@@ -1,6 +1,6 @@
 {
   "name": "@torava/product-utils",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -6436,6 +6436,12 @@
       "version": "4.0.1",
       "resolved": "https://registry.npmjs.org/@types/tough-cookie/-/tough-cookie-4.0.1.tgz",
       "integrity": "sha512-Y0K95ThC3esLEYD6ZuqNek29lNX2EM1qxV8y2FTLUB0ff5wWrk7az+mLrnNFUnaXcgKye22+sFBRXOgpPILZNg==",
+      "dev": true
+    },
+    "@types/underscore": {
+      "version": "1.11.4",
+      "resolved": "https://registry.npmjs.org/@types/underscore/-/underscore-1.11.4.tgz",
+      "integrity": "sha512-uO4CD2ELOjw8tasUrAhvnn2W4A0ZECOvMjCivJr4gA9pGgjv+qxKWY9GLTMVEK8ej85BxQOocUyE7hImmSQYcg==",
       "dev": true
     },
     "@types/yargs": {
