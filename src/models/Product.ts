@@ -7,7 +7,8 @@ import BrandShape from './Brand';
 import { DeepPartial } from '../utils/types';
 
 export default interface ProductShape {
-	id: number;
+	id?: number;
+	
 	name: string;
 
 	contributionList?: string;

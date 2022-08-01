@@ -4,7 +4,7 @@ import CategoryAttributeSourceShape from './CategoryAttributeSource';
 import { DeepPartial } from '../utils/types';
 
 export default interface CategoryAttributeShape {
-	id: number;
+	id?: number;
 
 	value?: number;
 	unit?: string;

@@ -1,7 +1,7 @@
 import TransactionShape from './Transaction';
 
 export default interface ReceiptShape {
-	id: number;
+	id?: number;
 
 	file?: string;
 	locale?: string;

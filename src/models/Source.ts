@@ -1,7 +1,7 @@
 import { DeepPartial } from '../utils/types';
 
 export default interface SourceShape {
-	id: number;
+	id?: number;
 	
 	name?: string;
 	authors?: string;

@@ -4,7 +4,7 @@ import ProductAttributeSourceShape from './ProductAttributeSource';
 import { DeepPartial } from '../utils/types';
 
 export default interface ProductAttributeShape {
-	id: number;
+	id?: number;
 	
 	value?: number;
 	unit?: string;

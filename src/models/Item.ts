@@ -2,7 +2,7 @@ import TransactionShape from './Transaction';
 import ProductShape from './Product';
 
 export default interface ItemShape {
-	id: number;
+	id?: number;
 
 	itemNumber?: string;
 	text?: string;

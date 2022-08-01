@@ -1,7 +1,7 @@
 import { NameTranslations } from '../utils/types';
 
 export default interface AttributeShape {
-	id: number;
+	id?: number;
 	
 	code?: string;
 	name: NameTranslations;

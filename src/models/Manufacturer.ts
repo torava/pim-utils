@@ -1,5 +1,5 @@
 export default interface ManufacturerShape {
-	id: number;
+	id?: number;
 
 	name?: string;
 	aliases?: string[];

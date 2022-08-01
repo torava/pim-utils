@@ -1,7 +1,7 @@
 import TransactionShape from "./Transaction";
 
 export default interface PartyShape {
-	id: number;
+	id?: number;
 
 	name?: string;
 	vat?: string;

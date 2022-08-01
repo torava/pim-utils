@@ -2,7 +2,7 @@ import ProductAttributeShape from './ProductAttribute';
 import SourceShape from './Source';
 
 export default interface ProductAttributeSourceShape {
-	id: number;
+	id?: number;
 
 	referenceUrl?: string;
 	referenceDate?: string;

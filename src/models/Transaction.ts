@@ -4,7 +4,7 @@ import ItemShape from './Item';
 import GroupShape from './Group';
 
 export default interface TransactionShape {
-	id: number;
+	id?: number;
 
 	totalPrice?: number;
 	totalPriceRead?: number;
