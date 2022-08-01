@@ -350,32 +350,15 @@ export const getStrippedChildCategories = async (categories: CategoryShape[] = [
   return strippedCategories;
 };
 
-export const getCategoryMinMaxAttributes = (
+export const getCategoryMinMaxAttributesWithMeasure = (
   category: CategoryPartialShape,
-  contribution: CategoryContributionPartialShape,
-  foodUnitAttribute: AttributeShape,
+  measure: CategoryContributionShape['amount'],
+  unit: CategoryContributionShape['unit'],
   attributeId: AttributeShape['id'],
   categories: CategoryShape[] = [],
   categoryOwnAttributes: CategoryAttributePartialShape[] = [],
   attributes: AttributeShape[] = []
-) => {
-  let unit: CategoryContributionShape['unit'],
-      measure: CategoryContributionShape['amount'],
-      portionAttribute;
-  
-  if (foodUnitAttribute) {
-    portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
-  }
-  if (contribution?.amount) {
-    measure = contribution.amount;
-    unit = contribution.unit;
-  } else if (portionAttribute) {
-    measure = portionAttribute.value;
-    unit = portionAttribute.unit;
-  } else {
-    return;
-  }
-  
+) => {  
   let minAttributeValue, minCategoryAttribute, maxAttributeValue, maxCategoryAttribute;
   const result = getCategoriesWithAttributes(categories, category.id, Number(attributeId));
   const [, categoryAttributes] = result?.[0] || [undefined, undefined];
@@ -406,6 +389,35 @@ export const getCategoryMinMaxAttributes = (
     });
   }
   return {minAttributeValue, minCategoryAttribute, maxAttributeValue, maxCategoryAttribute};
+};
+
+export const getCategoryMinMaxAttributes = (
+  category: CategoryPartialShape,
+  contribution: CategoryContributionPartialShape,
+  foodUnitAttribute: AttributeShape,
+  attributeId: AttributeShape['id'],
+  categories: CategoryShape[] = [],
+  categoryOwnAttributes: CategoryAttributePartialShape[] = [],
+  attributes: AttributeShape[] = []
+) => {
+  let unit: CategoryContributionShape['unit'],
+      measure: CategoryContributionShape['amount'],
+      portionAttribute;
+  
+  if (foodUnitAttribute) {
+    portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
+  }
+  if (contribution?.amount) {
+    measure = contribution.amount;
+    unit = contribution.unit;
+  } else if (portionAttribute) {
+    measure = portionAttribute.value;
+    unit = portionAttribute.unit;
+  } else {
+    return;
+  }
+  
+  return getCategoryMinMaxAttributesWithMeasure(category, measure, unit, attributeId, categories, categoryOwnAttributes, attributes);
 };
 
 export const resolveCategoryAttributes = (
