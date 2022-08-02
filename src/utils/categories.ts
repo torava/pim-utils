@@ -430,10 +430,14 @@ export const resolveCategoryAttributes = (
   let measure,
       categoryAttributes: CategoryAttributePartialShape[] = [];
 
+  const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
+  const portionMeasure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
+
   attributeIds.forEach(attributeId => {
     let minValue = 0,
         maxValue = 0,
         unit,
+        categoryContributionMeasure = 0,
         initialProductAttributes = category.attributes?.filter(productAttribute => productAttribute.attributeId === attributeId);
     
     category.contributions?.forEach(categoryContribution => {
@@ -443,6 +447,7 @@ export const resolveCategoryAttributes = (
         const {minAttributeValue, minCategoryAttribute, maxAttributeValue} = result;
         minValue+= minAttributeValue || 0;
         maxValue+= maxAttributeValue || 0;
+        categoryContributionMeasure+= convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
         unit = minCategoryAttribute.unit.split('/')[0];
       } else {
         return true;
@@ -455,6 +460,9 @@ export const resolveCategoryAttributes = (
       minValue = result.minAttributeValue;
       maxValue = result.maxAttributeValue;
       unit = minCategoryAttribute.unit.split('/')[0];
+    } else if (categoryContributionMeasure/portionMeasure < 0.99) {
+      console.log('insufficient contributions skipped', categoryContributionMeasure, portionMeasure);
+      return true;
     }
     
     const attribute = attributes.find(a => a.id === attributeId);
@@ -482,8 +490,7 @@ export const resolveCategoryAttributes = (
 
   if (foodUnitAttribute) {   
     if (category.attributes) {
-      const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
-      measure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
+      measure = portionMeasure;
     } else {
       measure = category.contributions?.reduce((total, productContribution) => {
         const contribution = categories.find(category => category.id === productContribution.contributionId);
