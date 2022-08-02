@@ -425,7 +425,8 @@ export const resolveCategoryAttributes = (
   attributeIds: AttributeShape['id'][],
   foodUnitAttribute: AttributeShape,
   categories: CategoryShape[] = [],
-  attributes: AttributeShape[] = []
+  attributes: AttributeShape[] = [],
+  contributionCoverageThreshold: number = 0
 ) => {
   let measure,
       categoryAttributes: CategoryAttributePartialShape[] = [];
@@ -460,7 +461,7 @@ export const resolveCategoryAttributes = (
       minValue = result.minAttributeValue;
       maxValue = result.maxAttributeValue;
       unit = minCategoryAttribute.unit.split('/')[0];
-    } else if (categoryContributionMeasure/portionMeasure < 0.99) {
+    } else if (categoryContributionMeasure/portionMeasure <= contributionCoverageThreshold) {
       console.log('insufficient contributions skipped', categoryContributionMeasure, portionMeasure);
       return true;
     }
