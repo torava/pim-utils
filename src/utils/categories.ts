@@ -438,31 +438,37 @@ export const resolveCategoryAttributes = (
     let minValue = 0,
         maxValue = 0,
         unit,
-        categoryContributionMeasure = 0,
+        categoryContributionCoverageMeasure = 0,
+        categoryContributionTotalMeasure = 0,
         initialProductAttributes = category.attributes?.filter(productAttribute => productAttribute.attributeId === attributeId);
     
     category.contributions?.forEach(categoryContribution => {
       const contribution = categories.find(category => category.id === categoryContribution.contributionId);
       const result = getCategoryMinMaxAttributes(contribution, categoryContribution, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
+      categoryContributionTotalMeasure+= convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
       if (result?.minCategoryAttribute) {
         const {minAttributeValue, minCategoryAttribute, maxAttributeValue} = result;
         minValue+= minAttributeValue || 0;
         maxValue+= maxAttributeValue || 0;
-        categoryContributionMeasure+= convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
+        categoryContributionCoverageMeasure+= convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
         unit = minCategoryAttribute.unit.split('/')[0];
       } else {
         return true;
       }
     });
 
-    const result = getCategoryMinMaxAttributes(category, undefined, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
+    const result = getCategoryMinMaxAttributes({...category, contributions: []}, undefined, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
     if (result?.minCategoryAttribute) {
       const {minCategoryAttribute} = result;
       minValue = result.minAttributeValue;
       maxValue = result.maxAttributeValue;
       unit = minCategoryAttribute.unit.split('/')[0];
-    } else if (categoryContributionMeasure/portionMeasure <= contributionCoverageThreshold) {
-      console.log('insufficient contributions skipped', categoryContributionMeasure, portionMeasure);
+    } else if (categoryContributionCoverageMeasure/categoryContributionTotalMeasure <= contributionCoverageThreshold) {
+      console.log(
+        'insufficient contributions skipped',
+        categoryContributionCoverageMeasure, '/', categoryContributionTotalMeasure, '=',
+        categoryContributionCoverageMeasure/categoryContributionTotalMeasure, '<=', contributionCoverageThreshold
+      );
       return true;
     }
     
