@@ -372,15 +372,12 @@ export const getCategoryMinMaxAttributesWithMeasure = (
   }
 
   if (!minAttributeValue && !maxAttributeValue && category.contributions?.length) {
-    const totalAmount = category.contributions.reduce((previousValue, currentValue) => {
-      return previousValue+currentValue.amount;
-    }, 0);
     category.contributions.forEach(contributionContribution => {
       const result = getCategoriesWithAttributes(categories, contributionContribution.contributionId, Number(attributeId));
       const [, categoryAttributes] = result?.[0] || [undefined, undefined];
-      let attributeResult = getAttributeValues(unit, measure*contributionContribution.amount/totalAmount, 1, undefined, categoryOwnAttributes, attributes);
+      let attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryOwnAttributes, attributes);
       if (!attributeResult.length) {
-        attributeResult = getAttributeValues(unit, measure*contributionContribution.amount/totalAmount, 1, undefined, categoryAttributes, attributes);
+        attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryAttributes, attributes);
       }
       if (attributeResult.length) {
         [minAttributeValue, minCategoryAttribute] = getMinAttributeValue(attributeResult);
@@ -437,7 +434,7 @@ export const resolveCategoryAttributes = (
   attributeIds.forEach(attributeId => {
     let minValue = 0,
         maxValue = 0,
-        unit,
+        unit = 'kg',
         categoryContributionCoverageMeasure = 0,
         categoryContributionTotalMeasure = 0,
         initialProductAttributes = category.attributes?.filter(productAttribute => productAttribute.attributeId === attributeId);
@@ -448,14 +445,17 @@ export const resolveCategoryAttributes = (
       categoryContributionTotalMeasure+= convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
       if (result?.minCategoryAttribute) {
         const {minAttributeValue, minCategoryAttribute, maxAttributeValue} = result;
-        minValue+= minAttributeValue || 0;
-        maxValue+= maxAttributeValue || 0;
-        categoryContributionCoverageMeasure+= convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
+        minValue+= minAttributeValue;
+        maxValue+= maxAttributeValue;
         unit = minCategoryAttribute.unit.split('/')[0];
+        categoryContributionCoverageMeasure+= convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
       } else {
         return true;
       }
     });
+
+    minValue*= portionMeasure || 1;
+    maxValue*= portionMeasure || 1;
 
     const result = getCategoryMinMaxAttributes({...category, contributions: []}, undefined, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
     if (result?.minCategoryAttribute) {
