@@ -1,5 +1,5 @@
 export default interface ConversionShape {
-	id: number;
+	id?: number;
 
 	fromLocale?: string;
 	fromCurrency?: string;

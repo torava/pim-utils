@@ -350,6 +350,44 @@ export const getStrippedChildCategories = async (categories: CategoryShape[] = [
   return strippedCategories;
 };
 
+export const getCategoryMinMaxAttributesWithMeasure = (
+  category: CategoryPartialShape,
+  measure: CategoryContributionShape['amount'],
+  unit: CategoryContributionShape['unit'],
+  attributeId: AttributeShape['id'],
+  categories: CategoryShape[] = [],
+  categoryOwnAttributes: CategoryAttributePartialShape[] = [],
+  attributes: AttributeShape[] = []
+) => {  
+  let minAttributeValue, minCategoryAttribute, maxAttributeValue, maxCategoryAttribute;
+  const result = getCategoriesWithAttributes(categories, category.id, Number(attributeId));
+  const [, categoryAttributes] = result?.[0] || [undefined, undefined];
+  let attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryOwnAttributes, attributes);
+  if (!attributeResult.length) {
+    attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryAttributes, attributes);
+  }
+  if (attributeResult.length) {
+    [minAttributeValue, minCategoryAttribute] = getMinAttributeValue(attributeResult);
+    [maxAttributeValue, maxCategoryAttribute] = getMaxAttributeValue(attributeResult);
+  }
+
+  if (!minAttributeValue && !maxAttributeValue && category.contributions?.length) {
+    category.contributions.forEach(contributionContribution => {
+      const result = getCategoriesWithAttributes(categories, contributionContribution.contributionId, Number(attributeId));
+      const [, categoryAttributes] = result?.[0] || [undefined, undefined];
+      let attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryOwnAttributes, attributes);
+      if (!attributeResult.length) {
+        attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryAttributes, attributes);
+      }
+      if (attributeResult.length) {
+        [minAttributeValue, minCategoryAttribute] = getMinAttributeValue(attributeResult);
+        [maxAttributeValue, maxCategoryAttribute] = getMaxAttributeValue(attributeResult);
+      }
+    });
+  }
+  return {minAttributeValue, minCategoryAttribute, maxAttributeValue, maxCategoryAttribute};
+};
+
 export const getCategoryMinMaxAttributes = (
   category: CategoryPartialShape,
   contribution: CategoryContributionPartialShape,
@@ -376,36 +414,7 @@ export const getCategoryMinMaxAttributes = (
     return;
   }
   
-  let minAttributeValue, minCategoryAttribute, maxAttributeValue, maxCategoryAttribute;
-  const result = getCategoriesWithAttributes(categories, category.id, Number(attributeId));
-  const [, categoryAttributes] = result?.[0] || [undefined, undefined];
-  let attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryOwnAttributes, attributes);
-  if (!attributeResult.length) {
-    attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryAttributes, attributes);
-  }
-  if (attributeResult.length) {
-    [minAttributeValue, minCategoryAttribute] = getMinAttributeValue(attributeResult);
-    [maxAttributeValue, maxCategoryAttribute] = getMaxAttributeValue(attributeResult);
-  }
-
-  if (!minAttributeValue && !maxAttributeValue && category.contributions?.length) {
-    const totalAmount = category.contributions.reduce((previousValue, currentValue) => {
-      return previousValue+currentValue.amount;
-    }, 0);
-    category.contributions.forEach(contributionContribution => {
-      const result = getCategoriesWithAttributes(categories, contributionContribution.contributionId, Number(attributeId));
-      const [, categoryAttributes] = result?.[0] || [undefined, undefined];
-      let attributeResult = getAttributeValues(unit, measure*contributionContribution.amount/totalAmount, 1, undefined, categoryOwnAttributes, attributes);
-      if (!attributeResult.length) {
-        attributeResult = getAttributeValues(unit, measure*contributionContribution.amount/totalAmount, 1, undefined, categoryAttributes, attributes);
-      }
-      if (attributeResult.length) {
-        [minAttributeValue, minCategoryAttribute] = getMinAttributeValue(attributeResult);
-        [maxAttributeValue, maxCategoryAttribute] = getMaxAttributeValue(attributeResult);
-      }
-    });
-  }
-  return {minAttributeValue, minCategoryAttribute, maxAttributeValue, maxCategoryAttribute};
+  return getCategoryMinMaxAttributesWithMeasure(category, measure, unit, attributeId, categories, categoryOwnAttributes, attributes);
 };
 
 export const resolveCategoryAttributes = (
@@ -413,36 +422,54 @@ export const resolveCategoryAttributes = (
   attributeIds: AttributeShape['id'][],
   foodUnitAttribute: AttributeShape,
   categories: CategoryShape[] = [],
-  attributes: AttributeShape[] = []
+  attributes: AttributeShape[] = [],
+  contributionCoverageThreshold: number = 0
 ) => {
   let measure,
       categoryAttributes: CategoryAttributePartialShape[] = [];
 
+  const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
+  const portionMeasure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
+
   attributeIds.forEach(attributeId => {
     let minValue = 0,
         maxValue = 0,
-        unit,
+        unit = 'kg',
+        categoryContributionCoverageMeasure = 0,
+        categoryContributionTotalMeasure = 0,
         initialProductAttributes = category.attributes?.filter(productAttribute => productAttribute.attributeId === attributeId);
     
     category.contributions?.forEach(categoryContribution => {
       const contribution = categories.find(category => category.id === categoryContribution.contributionId);
       const result = getCategoryMinMaxAttributes(contribution, categoryContribution, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
+      categoryContributionTotalMeasure+= convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
       if (result?.minCategoryAttribute) {
         const {minAttributeValue, minCategoryAttribute, maxAttributeValue} = result;
-        minValue+= minAttributeValue || 0;
-        maxValue+= maxAttributeValue || 0;
+        minValue+= minAttributeValue;
+        maxValue+= maxAttributeValue;
         unit = minCategoryAttribute.unit.split('/')[0];
+        categoryContributionCoverageMeasure+= convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
       } else {
         return true;
       }
     });
 
-    const result = getCategoryMinMaxAttributes(category, undefined, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
+    minValue*= portionMeasure || 1;
+    maxValue*= portionMeasure || 1;
+
+    const result = getCategoryMinMaxAttributes({...category, contributions: []}, undefined, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
     if (result?.minCategoryAttribute) {
       const {minCategoryAttribute} = result;
       minValue = result.minAttributeValue;
       maxValue = result.maxAttributeValue;
       unit = minCategoryAttribute.unit.split('/')[0];
+    } else if (categoryContributionCoverageMeasure/categoryContributionTotalMeasure <= contributionCoverageThreshold) {
+      console.log(
+        'insufficient contributions skipped',
+        categoryContributionCoverageMeasure, '/', categoryContributionTotalMeasure, '=',
+        categoryContributionCoverageMeasure/categoryContributionTotalMeasure, '<=', contributionCoverageThreshold
+      );
+      return true;
     }
     
     const attribute = attributes.find(a => a.id === attributeId);
@@ -470,8 +497,7 @@ export const resolveCategoryAttributes = (
 
   if (foodUnitAttribute) {   
     if (category.attributes) {
-      const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
-      measure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
+      measure = portionMeasure;
     } else {
       measure = category.contributions?.reduce((total, productContribution) => {
         const contribution = categories.find(category => category.id === productContribution.contributionId);

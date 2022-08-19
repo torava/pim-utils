@@ -5,7 +5,7 @@ import { DeepPartial, NameTranslations } from '../utils/types';
 
 // https://dev.to/tylerlwsmith/using-a-typescript-interface-to-define-model-properties-in-objection-js-1231
 export default interface CategoryShape {
-	id: number;
+	id?: number;
 	
 	name?: NameTranslations;
 	aliases?: string[];
