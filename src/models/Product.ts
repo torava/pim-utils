@@ -4,12 +4,10 @@ import CategoryShape from './Category';
 import ManufacturerShape from './Manufacturer';
 import ProductContributionShape from './ProductContribution';
 import BrandShape from './Brand';
-import { DeepPartial } from '../utils/types';
-
 export default interface ProductShape {
 	id?: number;
 	
-	name: string;
+	name?: string;
 
 	contributionList?: string;
 	aliases?: string[];
@@ -28,5 +26,3 @@ export default interface ProductShape {
 	brandId?: BrandShape['id'];
 	contributions?: ProductContributionShape[];
 }
-
-export type ProductPartialShape = DeepPartial<ProductShape>;

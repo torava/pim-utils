@@ -1,4 +1,3 @@
-import { DeepPartial } from '../utils/types';
 import CategoryShape from './Category';
 import ProductShape from './Product';
 
@@ -13,5 +12,3 @@ export default interface ProductContributionShape {
 	contribution?: CategoryShape;
 	contributionId?: CategoryShape['id'];
 }
-
-export type ProductContributionPartialShape = DeepPartial<ProductContributionShape>;

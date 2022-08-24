@@ -1,4 +1,3 @@
-import { DeepPartial } from "../utils/types";
 import AttributeShape from "./Attribute";
 import CategoryAttributeShape from "./CategoryAttribute";
 import SourceShape from "./Source";
@@ -16,5 +15,3 @@ export default interface CategoryAttributeSourceShape {
 	source?: SourceShape;
 	sourceId?: SourceShape['id'];
 }
-
-export type CategoryAttributeSourcePartialShape = DeepPartial<CategoryAttributeSourceShape>;
