@@ -1,5 +1,3 @@
-import { DeepPartial } from '../utils/types';
-
 export default interface SourceShape {
 	id?: number;
 	
@@ -9,5 +7,3 @@ export default interface SourceShape {
 	publicationDate?: string;
 	countryCode?: string;
 }
-
-export type SourcePartialShape = DeepPartial<SourceShape>;

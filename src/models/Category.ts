@@ -1,7 +1,7 @@
 import ProductShape from './Product';
 import CategoryAttributeShape from './CategoryAttribute';
 import CategoryContributionShape from './CategoryContribution';
-import { DeepPartial, NameTranslations } from '../utils/types';
+import { NameTranslations } from '../utils/types';
 
 // https://dev.to/tylerlwsmith/using-a-typescript-interface-to-define-model-properties-in-objection-js-1231
 export default interface CategoryShape {
@@ -17,5 +17,3 @@ export default interface CategoryShape {
 	parent?: CategoryShape;
 	parentId?: number;
 }
-
-export type CategoryPartialShape = DeepPartial<CategoryShape>;

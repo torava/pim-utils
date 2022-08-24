@@ -1,16 +1,16 @@
 import moment from 'moment';
 
 import AttributeShape from '../models/Attribute';
-import CategoryShape, { CategoryPartialShape } from '../models/Category';
+import CategoryShape from '../models/Category';
 import ManufacturerShape from '../models/Manufacturer';
 import { convertMeasure } from './entities';
 import { getTranslation } from '../utils/entities';
 import { stripName, stripDetails, getDetails } from './transactions';
 import { LevenshteinDistance } from './levenshteinDistance';
 import { measureRegExp } from './receipts';
-import CategoryAttributeShape, { CategoryAttributePartialShape } from '../models/CategoryAttribute';
+import CategoryAttributeShape from '../models/CategoryAttribute';
 import { Locale, NameTranslations, ObjectEntries, Token } from './types';
-import CategoryContributionShape, { CategoryContributionPartialShape } from '../models/CategoryContribution';
+import CategoryContributionShape from '../models/CategoryContribution';
 import { getAttributeValues, getMaxAttributeValue, getMinAttributeValue } from './attributes';
 
 export const getAverageRate = (filter: {start_date: string, end_date: string}, averageRange: number) => {
@@ -268,7 +268,7 @@ export const getContributionsFromList = (
   attributes: AttributeShape[] = []
 ) => {
   const tokens = getTokensFromContributionList(list);
-  const contributions: CategoryContributionPartialShape[] = [];
+  const contributions: CategoryContributionShape[] = [];
   tokens?.forEach(contributionToken => {
     const measureMatch = contributionToken.match(measureRegExp);
     const measure = measureMatch && parseFloat(measureMatch[1]);
@@ -293,7 +293,7 @@ export const getContributionsFromList = (
     });
     let strippedContributionToken = stripDetails(contributionToken);
     let [contributionContribution, token] = getClosestCategory(contributionToken, categories, contentLanguage, strippedContributionToken);
-    let contribution: CategoryContributionPartialShape = {
+    let contribution: CategoryContributionShape = {
       contribution: contributionContribution,
       contributionId: contributionContribution?.id
     };
@@ -351,14 +351,14 @@ export const getStrippedChildCategories = async (categories: CategoryShape[] = [
 };
 
 export const getCategoryMinMaxAttributesWithMeasure = (
-  category: CategoryPartialShape,
+  category: CategoryShape,
   measure: CategoryContributionShape['amount'],
   unit: CategoryContributionShape['unit'],
   attributeId: AttributeShape['id'],
   categories: CategoryShape[] = [],
-  categoryOwnAttributes: CategoryAttributePartialShape[] = [],
+  categoryOwnAttributes: CategoryAttributeShape[] = [],
   attributes: AttributeShape[] = []
-) => {  
+) => {
   let minAttributeValue, minCategoryAttribute, maxAttributeValue, maxCategoryAttribute;
   const result = getCategoriesWithAttributes(categories, category.id, Number(attributeId));
   const [, categoryAttributes] = result?.[0] || [undefined, undefined];
@@ -375,6 +375,7 @@ export const getCategoryMinMaxAttributesWithMeasure = (
     category.contributions.forEach(contributionContribution => {
       const result = getCategoriesWithAttributes(categories, contributionContribution.contributionId, Number(attributeId));
       const [, categoryAttributes] = result?.[0] || [undefined, undefined];
+
       let attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryOwnAttributes, attributes);
       if (!attributeResult.length) {
         attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryAttributes, attributes);
@@ -389,12 +390,12 @@ export const getCategoryMinMaxAttributesWithMeasure = (
 };
 
 export const getCategoryMinMaxAttributes = (
-  category: CategoryPartialShape,
-  contribution: CategoryContributionPartialShape,
+  category: CategoryShape,
+  contribution: CategoryContributionShape,
   foodUnitAttribute: AttributeShape,
   attributeId: AttributeShape['id'],
   categories: CategoryShape[] = [],
-  categoryOwnAttributes: CategoryAttributePartialShape[] = [],
+  categoryOwnAttributes: CategoryAttributeShape[] = [],
   attributes: AttributeShape[] = []
 ) => {
   let unit: CategoryContributionShape['unit'],
@@ -418,7 +419,7 @@ export const getCategoryMinMaxAttributes = (
 };
 
 export const resolveCategoryAttributes = (
-  category: CategoryPartialShape,
+  category: CategoryShape,
   attributeIds: AttributeShape['id'][],
   foodUnitAttribute: AttributeShape,
   categories: CategoryShape[] = [],
@@ -426,7 +427,7 @@ export const resolveCategoryAttributes = (
   contributionCoverageThreshold: number = 0
 ) => {
   let measure,
-      categoryAttributes: CategoryAttributePartialShape[] = [];
+      categoryAttributes: CategoryAttributeShape[] = [];
 
   const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
   const portionMeasure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
@@ -454,21 +455,21 @@ export const resolveCategoryAttributes = (
       }
     });
 
-    minValue*= portionMeasure || 1;
-    maxValue*= portionMeasure || 1;
+    minValue*= portionMeasure/categoryContributionTotalMeasure || 1;
+    maxValue*= portionMeasure/categoryContributionTotalMeasure || 1;
 
     const result = getCategoryMinMaxAttributes({...category, contributions: []}, undefined, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
+    console.log(
+      categoryContributionCoverageMeasure, '/', categoryContributionTotalMeasure, '=',
+      categoryContributionCoverageMeasure/categoryContributionTotalMeasure, contributionCoverageThreshold
+    );
     if (result?.minCategoryAttribute) {
       const {minCategoryAttribute} = result;
       minValue = result.minAttributeValue;
       maxValue = result.maxAttributeValue;
       unit = minCategoryAttribute.unit.split('/')[0];
     } else if (categoryContributionCoverageMeasure/categoryContributionTotalMeasure <= contributionCoverageThreshold) {
-      console.log(
-        'insufficient contributions skipped',
-        categoryContributionCoverageMeasure, '/', categoryContributionTotalMeasure, '=',
-        categoryContributionCoverageMeasure/categoryContributionTotalMeasure, '<=', contributionCoverageThreshold
-      );
+      console.log('insufficient contributions skipped');
       return true;
     }
     

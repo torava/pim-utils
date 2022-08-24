@@ -1,24 +1,24 @@
 import { stripDetails } from "./transactions";
 import CategoryShape from "../models/Category";
-import ProductShape, { ProductPartialShape } from "../models/Product";
+import ProductShape from "../models/Product";
 import { getAttributeValues, getMaxAttributeValue, getMinAttributeValue } from "./attributes";
 import { getCategoriesWithAttributes } from "./categories";
 import { convertMeasure } from "./entities";
 import { LevenshteinDistance } from './levenshteinDistance';
 import AttributeShape from "../models/Attribute";
 import CategoryContributionShape from "../models/CategoryContribution";
-import { ProductAttributePartialShape } from "../models/ProductAttribute";
+import ProductAttributeShape from "../models/ProductAttribute";
 import { Token } from "./types";
-import { ProductContributionPartialShape } from "../models/ProductContribution";
+import ProductContributionShape from "../models/ProductContribution";
 
 export const getProductCategoryMinMaxAttributes = (
   category: CategoryShape,
-  contribution: ProductContributionPartialShape,
-  product: ProductPartialShape,
+  contribution: ProductContributionShape,
+  product: ProductShape,
   foodUnitAttribute: AttributeShape,
   attributeId: AttributeShape['id'],
   categories: CategoryShape[] = [],
-  productAttributes: ProductAttributePartialShape[] = [],
+  productAttributes: ProductAttributeShape[] = [],
   attributes: AttributeShape[] = []
 ) => {
   let unit: CategoryContributionShape['unit'] | ProductShape['unit'],
@@ -74,14 +74,14 @@ export const getProductCategoryMinMaxAttributes = (
 };
 
 export const resolveProductAttributes = (
-  product: ProductPartialShape,
+  product: ProductShape,
   attributeIds: AttributeShape['id'][],
   foodUnitAttribute: AttributeShape,
   categories: CategoryShape[] = [],
   attributes: AttributeShape[] = []
 ) => {
   let measure,
-      productAttributes: ProductAttributePartialShape[] = [];
+      productAttributes: ProductAttributeShape[] = [];
 
   const category = categories.find(c => c.id === product.categoryId);
   attributeIds.forEach(attributeId => {

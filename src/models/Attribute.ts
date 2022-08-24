@@ -4,7 +4,7 @@ export default interface AttributeShape {
 	id?: number;
 	
 	code?: string;
-	name: NameTranslations;
+	name?: NameTranslations;
 	
 	children?: AttributeShape[];
 	parent?: AttributeShape;
