@@ -254,6 +254,40 @@ export const getClosestCategory = (
   return bestToken?.substring.length ? [bestCategory, bestToken] : [undefined, undefined];
 };
 
+export const findMeasure = (text?: string) => {
+  let measure = undefined,
+      unit = undefined;
+  if (text) {
+    const measureMatch = text.match(measureRegExp);
+    measure = measureMatch && parseFloat(measureMatch[1].replace(',', '.'));
+    if (measure && !isNaN(measure)) {
+      if (measureMatch[4]) {
+        unit = 'kg';
+      }
+      else if (measureMatch[5]) {
+        unit = 'g';
+      }
+      else if (measureMatch[6]) {
+        unit = 'l';
+      }
+    }
+  }
+  return {measure, unit};
+};
+
+export const findFoodUnitAttribute = (text?: string, attributes: AttributeShape[] = []) => {
+  let foodUnitAttribute: AttributeShape;
+  if (text) {
+    const {size} = getDetails();
+    Object.entries(size).forEach(([code, details]) => {
+      if (details.some(detail => text.match(detail))) {
+        foodUnitAttribute = attributes.find(attribute => attribute.code === code);
+      }
+    });
+  }
+  return foodUnitAttribute;
+};
+
 export const getTokensFromContributionList = (list: string) => (
   list?.replace(/[([][^)\]]*[)\]]|\./g, '')
   .replace(/\s{2,}/g, ' ')
