@@ -360,7 +360,7 @@ export const getCategoryMinMaxAttributesWithMeasure = (
   attributes: AttributeShape[] = []
 ) => {
   let minAttributeValue, minCategoryAttribute, maxAttributeValue, maxCategoryAttribute;
-  const result = getCategoriesWithAttributes(categories, category.id, Number(attributeId));
+  const result = getCategoriesWithAttributes(categories, category.id, attributeId);
   const [, categoryAttributes] = result?.[0] || [undefined, undefined];
   let attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryOwnAttributes, attributes);
   if (!attributeResult.length) {
@@ -370,12 +370,10 @@ export const getCategoryMinMaxAttributesWithMeasure = (
     [minAttributeValue, minCategoryAttribute] = getMinAttributeValue(attributeResult);
     [maxAttributeValue, maxCategoryAttribute] = getMaxAttributeValue(attributeResult);
   }
-
   if (!minAttributeValue && !maxAttributeValue && category.contributions?.length) {
     category.contributions.forEach(contributionContribution => {
       const result = getCategoriesWithAttributes(categories, contributionContribution.contributionId, Number(attributeId));
       const [, categoryAttributes] = result?.[0] || [undefined, undefined];
-
       let attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryOwnAttributes, attributes);
       if (!attributeResult.length) {
         attributeResult = getAttributeValues(unit, measure, 1, undefined, categoryAttributes, attributes);
@@ -442,7 +440,15 @@ export const resolveCategoryAttributes = (
     
     category.contributions?.forEach(categoryContribution => {
       const contribution = categories.find(category => category.id === categoryContribution.contributionId);
-      const result = getCategoryMinMaxAttributes(contribution, categoryContribution, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
+      const result = getCategoryMinMaxAttributes(
+        contribution,
+        categoryContribution,
+        foodUnitAttribute,
+        attributeId,
+        categories,
+        initialProductAttributes,
+        attributes
+      );
       categoryContributionTotalMeasure+= convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
       if (result?.minCategoryAttribute) {
         const {minAttributeValue, minCategoryAttribute, maxAttributeValue} = result;
@@ -458,7 +464,15 @@ export const resolveCategoryAttributes = (
     minValue*= portionMeasure/categoryContributionTotalMeasure || 1;
     maxValue*= portionMeasure/categoryContributionTotalMeasure || 1;
 
-    const result = getCategoryMinMaxAttributes({...category, contributions: []}, undefined, foodUnitAttribute, attributeId, categories, initialProductAttributes, attributes);
+    const result = getCategoryMinMaxAttributes(
+      { ...category, contributions: [] },
+      undefined,
+      foodUnitAttribute,
+      attributeId,
+      categories,
+      initialProductAttributes,
+      attributes
+    );
     console.log(
       categoryContributionCoverageMeasure, '/', categoryContributionTotalMeasure, '=',
       categoryContributionCoverageMeasure/categoryContributionTotalMeasure, contributionCoverageThreshold
