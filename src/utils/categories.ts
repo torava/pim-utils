@@ -167,7 +167,7 @@ export function resolveCategories(items: CategoryShape[], locale: Locale) {
 }
 
 export function resolveCategoryPrices(categories: (CategoryShape & {
-  price_sum: number
+  price_sum?: number
 })[]) {
   categories && categories.reduce(function resolver(sum, category) {
     if (category.products?.length) {
