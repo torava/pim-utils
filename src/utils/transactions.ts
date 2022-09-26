@@ -521,7 +521,7 @@ export const resolveCategories = async (
               const productCategoryName =
                 item.product.category.name[locale]?.toLowerCase();
               const categoryName = categoryTranslation.toLowerCase();
-              distance = stringSimilarity(productCategoryName, categoryName);
+              distance = stringSimilarity(productCategoryName || "", categoryName || "");
               //accuracy = (trimmedItemName.length-distance)/trimmedItemName.length;
 
               if (distance > 0.4) {
