@@ -46,11 +46,11 @@ export function getCVSrcFromBase64(base64Data) {
 // Decoding base64 image
 // Source: http://stackoverflow.com/questions/20267939/nodejs-write-base64-image-file
 export function decodeBase64Image(dataString) {
-  var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+  var matches = dataString.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
   var response = {};
 
   if (matches.length !== 3) {
-    return new Error('Invalid input string');
+    throw new Error('Invalid input string');
   }
 
   response.type = matches[1];

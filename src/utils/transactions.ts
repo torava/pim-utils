@@ -566,12 +566,13 @@ export const resolveCategories = async (
       if (itemProduct?.distance > itemCategory?.distance) {
         item.product = itemProduct.product;
 
-        console.log(itemProduct);
+        console.log('itemProduct', itemProduct);
         continue;
       } else if (itemCategory) {
         item.product.categoryId = itemCategory.category.id;
+        delete item.product.category;
 
-        console.log(itemCategory);
+        console.log('itemCategory', itemCategory);
       }
 
       //console.log(item_categories);
