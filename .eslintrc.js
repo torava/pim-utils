@@ -7,8 +7,7 @@ module.exports = {
         "jest/globals": true
     },
     "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+        "eslint:recommended"
     ],
     "parserOptions": {
         "ecmaVersion": 12,

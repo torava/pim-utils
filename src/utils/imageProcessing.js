@@ -2,24 +2,6 @@ import {getDocument, GlobalWorkerOptions} from 'pdfjs-dist/build/pdf';
 
 GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-unused-vars
-  interface Window { cv: any }
-  // eslint-disable-next-line @typescript-eslint/no-namespace, no-unused-vars
-  namespace NodeJS {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-    interface Global {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      createCanvas: any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      window: any
-    }
-  }
-}
-
-const cv = typeof(window) !== 'undefined' && window.cv;
-const createCanvas = global.createCanvas;
-
 export function getSrc(orig, from_grayscale) {
   let src;
   if (from_grayscale) {
@@ -63,18 +45,16 @@ export function getCVSrcFromBase64(base64Data) {
 
 // Decoding base64 image
 // Source: http://stackoverflow.com/questions/20267939/nodejs-write-base64-image-file
-export function decodeBase64Image(dataString: string) {
-  const matches = dataString.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+export function decodeBase64Image(dataString) {
+  var matches = dataString.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+  var response = {};
 
-  let response = {};
-
-  if (matches?.length !== 3) {
+  if (matches.length !== 3) {
     throw new Error('Invalid input string');
   }
 
-  const type = matches[1];
-  const data = Buffer.from(matches[2], 'base64');
-  response = { type, data };
+  response.type = matches[1];
+  response.data = Buffer.from(matches[2], 'base64');
 
   return response;
 }
@@ -171,7 +151,6 @@ export function rotate(src, rotate) {
   else if (rotate == 180){
     cv.flip(src, src, -1);
   }
-  // eslint-disable-next-line no-empty
   else if (!rotate) {}
   else {
     // get rotation matrix for rotating the image around its center in pixel coordinates
@@ -233,13 +212,13 @@ export function crop(src) {
 
 export function getLargestContourIndex(contours) {
   let maxArea = 0;
-  //let cnt;
+  let cnt;
   let largestIndex;
   for (let i = 0; i < contours.size(); ++i) {
     let area = cv.contourArea(contours.get(i), false);
     console.log(area);
     if (area > maxArea) {
-      //cnt = contours.get(i);
+      cnt = contours.get(i);
       largestIndex = i;
       maxArea = area;
     }

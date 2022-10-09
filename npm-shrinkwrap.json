@@ -1,12 +1,12 @@
 {
   "name": "@torava/product-utils",
-  "version": "1.2.5",
+  "version": "1.2.1",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
       "name": "@torava/product-utils",
-      "version": "1.2.5",
+      "version": "1.2.1",
       "license": "UNLICENSED",
       "dependencies": {
         "canvas": "^2.8.0",
@@ -45,7 +45,7 @@
         "@types/jsdom": "^16.2.13",
         "@types/lodash": "^4.14.178",
         "@types/morgan": "^1.9.3",
-        "@types/pdfjs-dist": "^2.10.378",
+        "@types/pdfjs-dist": "^2.1.7",
         "@types/swagger-ui-express": "^4.1.3",
         "@types/underscore": "^1.11.4",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
@@ -7026,14 +7026,10 @@
       "dev": true
     },
     "node_modules/@types/pdfjs-dist": {
-      "version": "2.10.378",
-      "resolved": "https://registry.npmjs.org/@types/pdfjs-dist/-/pdfjs-dist-2.10.378.tgz",
-      "integrity": "sha512-TRdIPqdsvKmPla44kVy4jv5Nt5vjMfVjbIEke1CRULIrwKNRC4lIiZvNYDJvbUMNCFPNIUcOKhXTyMJrX18IMA==",
-      "deprecated": "This is a stub types definition. pdfjs-dist provides its own type definitions, so you do not need this installed.",
-      "dev": true,
-      "dependencies": {
-        "pdfjs-dist": "*"
-      }
+      "version": "2.1.7",
+      "resolved": "https://registry.npmjs.org/@types/pdfjs-dist/-/pdfjs-dist-2.1.7.tgz",
+      "integrity": "sha512-nQIwcPUhkAIyn7x9NS0lR/qxYfd5unRtfGkMjvpgF4Sh28IXftRymaNmFKTTdejDNY25NDGSIyjwj/BRwAPexg==",
+      "dev": true
     },
     "node_modules/@types/prettier": {
       "version": "2.3.2",
@@ -23638,13 +23634,10 @@
       "dev": true
     },
     "@types/pdfjs-dist": {
-      "version": "2.10.378",
-      "resolved": "https://registry.npmjs.org/@types/pdfjs-dist/-/pdfjs-dist-2.10.378.tgz",
-      "integrity": "sha512-TRdIPqdsvKmPla44kVy4jv5Nt5vjMfVjbIEke1CRULIrwKNRC4lIiZvNYDJvbUMNCFPNIUcOKhXTyMJrX18IMA==",
-      "dev": true,
-      "requires": {
-        "pdfjs-dist": "*"
-      }
+      "version": "2.1.7",
+      "resolved": "https://registry.npmjs.org/@types/pdfjs-dist/-/pdfjs-dist-2.1.7.tgz",
+      "integrity": "sha512-nQIwcPUhkAIyn7x9NS0lR/qxYfd5unRtfGkMjvpgF4Sh28IXftRymaNmFKTTdejDNY25NDGSIyjwj/BRwAPexg==",
+      "dev": true
     },
     "@types/prettier": {
       "version": "2.3.2",
