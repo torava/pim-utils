@@ -7,7 +7,7 @@ import { convertMeasure, getLeafIds } from "./entities";
 export const getAttributeValues = (
   unit: CategoryAttributeShape['unit'],
   measure: number,
-  quantity: number = 1,
+  quantity = 1,
   price: number = undefined,
   attributeValues: ProductAttributeShape[] | CategoryAttributeShape[] = [],
   attributes: AttributeShape[] = []
@@ -18,8 +18,9 @@ export const getAttributeValues = (
     foundAttributes.forEach(() => {
       const perUnit = categoryAttribute?.unit?.split('/')?.[1];
       
-      let value,
-          rate = 1;
+      let value;
+
+      const rate = 1;
 
       if (perUnit === 'EUR' && !isNaN(price)) {
         value = rate*categoryAttribute.value;
@@ -48,7 +49,7 @@ export const getAttributeIdsFromCodes = (attributeCodes?: string, attributes: At
   attributeCodes?.split(',').forEach(code => {
     const id = attributes.find(attribute => attribute.code === code)?.id;
     if (id) {
-      let ids: Attribute['id'][] = [];
+      const ids: Attribute['id'][] = [];
       getLeafIds(attributes, id, ids);
       if (ids.length) {
         attributeIds = attributeIds.concat(ids);

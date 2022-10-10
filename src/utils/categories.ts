@@ -12,6 +12,8 @@ import CategoryAttributeShape from '../models/CategoryAttribute';
 import { Locale, NameTranslations, ObjectEntries, Token } from './types';
 import CategoryContributionShape from '../models/CategoryContribution';
 import { getAttributeValues, getMaxAttributeValue, getMinAttributeValue } from './attributes';
+import ProductShape from '../models/Product';
+import ItemShape from '../models/Item';
 
 export const getAverageRate = (filter: {start_date: string, end_date: string}, averageRange: number) => {
   const {start_date, end_date} = filter;
@@ -25,7 +27,7 @@ export const aggregateCategoryPrice = (resolvedCategories: (CategoryShape & {
   weight_sum: number,
   volume_sum: number
 })[], averageRate: number) => {
-  let categories = [...resolvedCategories];
+  const categories = [...resolvedCategories];
   categories.reduce(function resolver(sum, category) {
     if (category.products?.length) {
       let itemPrices = 0,
@@ -47,7 +49,7 @@ export const aggregateCategoryPrice = (resolvedCategories: (CategoryShape & {
       category.volume_sum = itemVolumes*averageRate;
     }
     if (category.children?.length) {
-      let sum: {
+      const sum: {
         price_sum: number,
         weight_sum: number,
         volume_sum: number
@@ -112,7 +114,7 @@ export const getCategoriesWithAttributes = (
 ) => {
   if (!categoryId) return;
 
-  let results: [CategoryShape, CategoryAttributeShape[]][] = [];
+  const results: [CategoryShape, CategoryAttributeShape[]][] = [];
   
   const result = getCategoryWithAttributes(categories, categoryId, attributeId);
   if (result) {
@@ -136,11 +138,11 @@ export function resolveCategories(items: CategoryShape[], locale: Locale) {
   let itemAttributes: CategoryAttributeShape[],
       resolvedAttributes: {[key: CategoryAttributeShape['id']]: CategoryAttributeShape},
       item;
-  for (let i in items) {
+  for (const i in items) {
     item = items[i];
     resolvedAttributes = {};
     itemAttributes = item.attributes;
-    for (let n in itemAttributes) {
+    for (const n in itemAttributes) {
       if (itemAttributes[n].attribute) {
         itemAttributes[n].attribute.name = getTranslation(itemAttributes[n].attribute.name, locale);
 
@@ -166,25 +168,47 @@ export function resolveCategories(items: CategoryShape[], locale: Locale) {
   }
 }
 
-export function resolveCategoryPrices(categories: (CategoryShape & {
-  price_sum?: number
-})[]) {
+export const resolveCategoryPrices = (categories: (CategoryShape & {
+  priceSum?: number
+})[]) => {
   categories && categories.reduce(function resolver(sum, category) {
     if (category.products?.length) {
-      let item_prices = 0;
+      let itemPrices = 0;
       category.products.map(product => {
         product.items.map(item => {
-          item_prices+= item.price;
+          itemPrices+= item.price;
         });
       });
-      category.price_sum = (category.price_sum || 0)+item_prices; 
+      category.priceSum = (category.priceSum || 0)+itemPrices; 
     }
     if (category.children?.length) {
-      category.price_sum = (category.price_sum || 0)+category.children.reduce(resolver, 0);
+      category.priceSum = (category.priceSum || 0)+category.children.reduce(resolver, 0);
     }
-    return sum+(category.price_sum || 0);
+    return sum+(category.priceSum || 0);
   }, 0);
-}
+};
+
+export const resolveCategoryContributionPrices = (category: CategoryShape, products: ProductShape[] = [], items: ItemShape[] = []) => (
+  category && category.contributions.reduce(function resolver(sum, categoryContribution) {
+    products.forEach(product => {
+      if (product.categoryId === categoryContribution.contributionId) {
+        const productItem = items.find(item => {
+          if (item.productId === product.id) {
+            if (item?.price) {
+              sum+= item.price;
+              return true;
+            }
+          }
+        });
+        return productItem ? false : true;
+      }
+    });
+    if (categoryContribution.contribution?.contributions?.length) {
+      sum+= categoryContribution.contribution.contributions.reduce(resolver, 0);
+    }
+    return sum;
+  }, 0)
+);
 
 export const getStrippedCategories = (categories: (CategoryShape & {
   strippedName?: NameTranslations
@@ -456,10 +480,10 @@ export const resolveCategoryAttributes = (
   foodUnitAttribute: AttributeShape,
   categories: CategoryShape[] = [],
   attributes: AttributeShape[] = [],
-  contributionCoverageThreshold: number = 0
+  contributionCoverageThreshold = 0
 ) => {
-  let measure,
-      categoryAttributes: CategoryAttributeShape[] = [];
+  let measure;
+  const categoryAttributes: CategoryAttributeShape[] = [];
 
   const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
   const portionMeasure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
@@ -469,8 +493,9 @@ export const resolveCategoryAttributes = (
         maxValue = 0,
         unit = 'kg',
         categoryContributionCoverageMeasure = 0,
-        categoryContributionTotalMeasure = 0,
-        initialProductAttributes = category.attributes?.filter(productAttribute => productAttribute.attributeId === attributeId);
+        categoryContributionTotalMeasure = 0;
+
+    const initialProductAttributes = category.attributes?.filter(productAttribute => productAttribute.attributeId === attributeId);
     
     category.contributions?.forEach(categoryContribution => {
       const contribution = categories.find(category => category.id === categoryContribution.contributionId);

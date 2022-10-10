@@ -1,5 +1,6 @@
 import AttributeShape from "./models/Attribute";
 import CategoryShape from "./models/Category";
+import ItemShape from "./models/Item";
 import ProductShape from "./models/Product";
 
 export const toArrayBuffer = (buffer: Buffer) => {
@@ -491,6 +492,31 @@ export const mockAttributes: AttributeShape[] = [
     },
     "parentId": 2
   }
+];
+
+export const mockItems: ItemShape[] = [
+  {
+    id: 58,
+    itemNumber: null,
+    text: null,
+    price: 1.94,
+    quantity: 1,
+    measure: null,
+    unit: null,
+    transactionId: null,
+    productId: 574,
+  },
+  {
+    id: 234,
+    itemNumber: null,
+    text: null,
+    price: 0.65,
+    quantity: 1,
+    measure: 500,
+    unit: "g",
+    transactionId: 33,
+    productId: 1
+  },
 ];
 
 export const mockProducts: ProductShape[] = [
