@@ -188,14 +188,28 @@ export const resolveCategoryPrices = (categories: (CategoryShape & {
   }, 0);
 };
 
-export const resolveCategoryContributionPrices = (category: CategoryShape, products: ProductShape[] = [], items: ItemShape[] = []) => (
-  category && category.contributions.reduce(function resolver(sum, categoryContribution) {
+export const resolveCategoryContributionPrices = (
+  category: CategoryShape,
+  products: ProductShape[] = [],
+  items: ItemShape[] = [],
+  foodUnitAttribute: AttributeShape,
+  contributionCoverageThreshold = 0) => {
+  let categoryContributionTotalMeasure = 0,
+      categoryContributionCoverageMeasure = 0;
+    
+  const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
+  const portionMeasure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
+  
+  const sum = category?.contributions.reduce(function resolver(sum, categoryContribution) {
+    const convertedAmount = convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
+    categoryContributionTotalMeasure+= convertedAmount;
     products.forEach(product => {
       if (product.categoryId === categoryContribution.contributionId) {
         const productItem = items.find(item => {
           if (item.productId === product.id) {
             if (item?.price) {
-              sum+= item.price;
+              sum+= item.price/convertMeasure(item.measure || product.measure, item.unit || product.unit, 'kg')*convertedAmount;
+              categoryContributionCoverageMeasure+= convertedAmount;
               return true;
             }
           }
@@ -207,8 +221,9 @@ export const resolveCategoryContributionPrices = (category: CategoryShape, produ
       sum+= categoryContribution.contribution.contributions.reduce(resolver, 0);
     }
     return sum;
-  }, 0)
-);
+  }, 0);
+  return categoryContributionCoverageMeasure > contributionCoverageThreshold ? sum/categoryContributionTotalMeasure*portionMeasure : undefined;
+};
 
 export const getStrippedCategories = (categories: (CategoryShape & {
   strippedName?: NameTranslations

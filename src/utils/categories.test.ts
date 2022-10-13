@@ -13,6 +13,7 @@ import {
   resolveCategoryAttributes,
   resolveCategoryContributionPrices,
 } from "./categories";
+import { convertMeasure } from "./entities";
 
 describe("categories utils", () => {
   it("should get tokens from contribution list", () => {
@@ -129,11 +130,23 @@ describe("categories utils", () => {
   });
 
   it("should resolve category contribution prices", () => {
+    const category = mockCategories[0];
     const price = resolveCategoryContributionPrices(
-      mockCategories[0],
+      category,
       mockProducts,
-      mockItems
+      mockItems,
+      mockAttributes[2]
     );
-    expect(price).toEqual(0.65);
+    const item = mockItems[1];
+    expect(price).toEqual(
+      item.price / 
+      convertMeasure(item.measure, item.unit, 'kg') *
+      convertMeasure(category.contributions[0].amount, category.contributions[0].unit, 'kg') /
+      (
+        convertMeasure(category.contributions[0].amount, category.contributions[0].unit, 'kg') +
+        convertMeasure(category.contributions[1].amount, category.contributions[1].unit, 'kg')
+      ) *
+      convertMeasure(category.attributes[1].value, category.attributes[1].unit, 'kg')
+    );
   });
 });
