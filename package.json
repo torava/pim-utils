@@ -1,6 +1,6 @@
 {
   "name": "@torava/product-utils",
-  "version": "1.2.6",
+  "version": "1.2.8",
   "description": "product-utils",
   "scripts": {
     "test": "jest",
@@ -17,7 +17,6 @@
   "author": "Teemu Orava",
   "license": "UNLICENSED",
   "dependencies": {
-    "canvas": "^2.8.0",
     "classnames": "^2.2.6",
     "csv-parse": "^4.15.1",
     "exceljs": "^4.3.0",
