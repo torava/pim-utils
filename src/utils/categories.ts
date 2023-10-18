@@ -194,15 +194,13 @@ export const resolveCategoryContributionPrices = (
   items: ItemShape[] = [],
   foodUnitAttribute: AttributeShape,
   contributionCoverageThreshold = 0) => {
-  let categoryContributionTotalMeasure = 0,
-      categoryContributionCoverageMeasure = 0;
+  let categoryContributionCoverageMeasure = 0;
     
   const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
   const portionMeasure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
   
   const sum = category?.contributions.reduce(function resolver(sum, categoryContribution) {
     const convertedAmount = convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
-    categoryContributionTotalMeasure+= convertedAmount;
     products.forEach(product => {
       if (product.categoryId === categoryContribution.contributionId) {
         const productItem = items.find(item => {
@@ -222,7 +220,7 @@ export const resolveCategoryContributionPrices = (
     }
     return sum;
   }, 0);
-  return categoryContributionCoverageMeasure > contributionCoverageThreshold ? sum/categoryContributionTotalMeasure*portionMeasure : undefined;
+  return categoryContributionCoverageMeasure > contributionCoverageThreshold ? sum/categoryContributionCoverageMeasure*portionMeasure : undefined;
 };
 
 export const getStrippedCategories = (categories: (CategoryShape & {
@@ -489,6 +487,32 @@ export const getCategoryMinMaxAttributes = (
   return getCategoryMinMaxAttributesWithMeasure(category, measure, unit, attributeId, categories, categoryOwnAttributes, attributes);
 };
 
+export const getCategoryPortionMeasure = (
+  category: CategoryShape,
+  foodUnitAttribute: AttributeShape,
+) => {
+  const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
+  return convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
+};
+
+export const getCategoryMeasure = (
+  category: CategoryShape,
+  foodUnitAttribute: AttributeShape,
+  categories: CategoryShape[] = [],
+) => {
+  if (foodUnitAttribute) {   
+    if (category.attributes) {
+      return getCategoryPortionMeasure(category, foodUnitAttribute);
+    } else {
+      return category.contributions?.reduce((total, productContribution) => {
+        const contribution = categories.find(category => category.id === productContribution.contributionId);
+        return total+getCategoryPortionMeasure(contribution, foodUnitAttribute);
+      }, 0);
+    }
+  }
+};
+
+
 export const resolveCategoryAttributes = (
   category: CategoryShape,
   attributeIds: AttributeShape['id'][],
@@ -497,11 +521,9 @@ export const resolveCategoryAttributes = (
   attributes: AttributeShape[] = [],
   contributionCoverageThreshold = 0
 ) => {
-  let measure;
+  const measure = getCategoryMeasure(category, foodUnitAttribute, categories);
+  const portionMeasure = getCategoryPortionMeasure(category, foodUnitAttribute);
   const categoryAttributes: CategoryAttributeShape[] = [];
-
-  const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
-  const portionMeasure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
 
   attributeIds.forEach(attributeId => {
     let minValue = 0,
@@ -583,18 +605,6 @@ export const resolveCategoryAttributes = (
       });
     }
   });
-
-  if (foodUnitAttribute) {   
-    if (category.attributes) {
-      measure = portionMeasure;
-    } else {
-      measure = category.contributions?.reduce((total, productContribution) => {
-        const contribution = categories.find(category => category.id === productContribution.contributionId);
-        const portionAttribute = contribution.attributes.find(a => a.attributeId === foodUnitAttribute.id);
-        return total+convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
-      }, 0);
-    }
-  }
 
   return { categoryAttributes, measure };
 };
