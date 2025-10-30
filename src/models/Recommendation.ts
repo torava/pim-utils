@@ -14,8 +14,8 @@ enum Type {
 
 export default interface RecommendationShape {
 	id: number;
-	value: number;
-	type: Type;
+	minValue: number;
+	maxValue: number;
   unit: string;
 	perUnit: string;
 	minimumAge: number;
