@@ -354,8 +354,6 @@ export const resolveCategories = async (
     });
     //fs.writeFileSync('./ner.json', JSON.stringify(manager.save()));
 
-    console.log("trimmed categories", trimmedCategories);
-
     for (let item of transaction.items) {
       if (!item) continue;
 

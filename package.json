@@ -1,6 +1,6 @@
 {
   "name": "@torava/product-utils",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "description": "product-utils",
   "scripts": {
     "test": "jest",

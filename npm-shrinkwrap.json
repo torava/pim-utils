@@ -1,12 +1,12 @@
 {
   "name": "@torava/product-utils",
-  "version": "1.2.6",
+  "version": "1.2.8",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
       "name": "@torava/product-utils",
-      "version": "1.2.6",
+      "version": "1.2.8",
       "license": "UNLICENSED",
       "dependencies": {
         "classnames": "^2.2.6",
