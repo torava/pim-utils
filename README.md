@@ -1,5 +1,11 @@
-# Installing
+# Publishing
+```
+npm run build
+npm pack
+npm publish
+```
 
+# Installing
 ```
 sudo yum update -y
 sudo apt-get install 
