@@ -205,8 +205,9 @@ export const resolveCategoryContributionPrices = (
       if (product.categoryId === categoryContribution.contributionId) {
         const productItem = items.find(item => {
           if (item.productId === product.id) {
-            if (item?.price) {
-              sum+= item.price/convertMeasure(item.measure || product.measure, item.unit || product.unit, 'kg')*convertedAmount;
+            if (item?.price && (item.measure || product.measure)) {
+              const itemAmount = convertMeasure(item.measure || product.measure, item.unit || product.unit, 'kg');
+              sum+= item.price/itemAmount*convertedAmount;
               categoryContributionCoverageMeasure+= convertedAmount;
               return true;
             }
