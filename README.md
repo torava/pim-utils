@@ -21,4 +21,4 @@ sudo chmod 666 /var/run/docker.sock
 docker login registry.gitlab.com/torava/bookkeepr
 docker compose up -d
 docker container ls
-```
+```<§

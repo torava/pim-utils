@@ -198,16 +198,23 @@ export const resolveCategoryContributionPrices = (
     
   const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
   const portionMeasure = convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
+
+  let totalMeasure = 0;
   
   const sum = category?.contributions.reduce(function resolver(sum, categoryContribution) {
+    console.log('categoryContribution', categoryContribution);
     const convertedAmount = convertMeasure(categoryContribution.amount, categoryContribution.unit, 'kg');
-    products.forEach(product => {
+    totalMeasure+= categoryContribution.contribution?.contributions.length ? 0 : convertedAmount;
+    products.every(product => {
       if (product.categoryId === categoryContribution.contributionId) {
         const productItem = items.find(item => {
           if (item.productId === product.id) {
-            if (item?.price && (item.measure || product.measure)) {
+            if (item?.price && (item.measure || product.measure) && (item.unit || product.unit)) {
+              console.log('item, product', item, product);
               const itemAmount = convertMeasure(item.measure || product.measure, item.unit || product.unit, 'kg');
-              sum+= item.price/itemAmount*convertedAmount;
+              const amountPrice = item.price/itemAmount*convertedAmount;
+              console.log('amountPrice', amountPrice);
+              sum+= amountPrice;
               categoryContributionCoverageMeasure+= convertedAmount;
               return true;
             }
@@ -215,13 +222,20 @@ export const resolveCategoryContributionPrices = (
         });
         return productItem ? false : true;
       }
+      return true;
     });
     if (categoryContribution.contribution?.contributions?.length) {
       sum+= categoryContribution.contribution.contributions.reduce(resolver, 0);
     }
     return sum;
   }, 0);
-  return categoryContributionCoverageMeasure > contributionCoverageThreshold ? sum/categoryContributionCoverageMeasure*portionMeasure : undefined;
+  console.log(
+    'categoryContributionCoverageMeasure, totalMeasure, contributionCoverageThreshold',
+    categoryContributionCoverageMeasure,
+    totalMeasure,
+    contributionCoverageThreshold
+  );
+  return categoryContributionCoverageMeasure/totalMeasure > contributionCoverageThreshold ? sum*portionMeasure : undefined;
 };
 
 export const getStrippedCategories = (categories: (CategoryShape & {

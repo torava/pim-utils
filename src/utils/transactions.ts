@@ -124,8 +124,8 @@ export const getDetails = (manufacturers: ManufacturerShape[] = []) => {
     filling: ['filling', 'täyte']
   };
   details.origin = {
-    local: ['kotimainen'],
-    imported: ['ulkomainen'],
+    local: ['kotimainen', 'kotimaiset'],
+    imported: ['ulkomainen', 'ulkomaiset'],
     finnish: ['suomi', 'suomalainen', 'suomesta'],
     californian: ['kalifornia', 'kalifornialainen'],
     spanish: ['espanja', 'espanjalainen']
@@ -342,7 +342,7 @@ export const resolveCategories = async (
 
     console.log("categories length", categories.length);
 
-    let trimmedCategories = categories.filter(category => category.attributes.length ? true : false).map(category => {
+    const trimmedCategories = categories.filter(category => category.attributes.length ? true : false).map(category => {
       const trimmedCategory: CategoryShape & {trimmedName: NameTranslations} = {...category, trimmedName: {}};
       if (trimmedCategory.attributes.length) {
         let name = trimmedCategory.name;
@@ -354,7 +354,7 @@ export const resolveCategories = async (
     });
     //fs.writeFileSync('./ner.json', JSON.stringify(manager.save()));
 
-    for (let item of transaction.items) {
+    for (const item of transaction.items) {
       if (!item) continue;
 
       const itemCategories: any[] = [];
