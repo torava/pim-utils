@@ -1,7 +1,6 @@
 import { stringSimilarity } from "string-similarity-js";
 import CategoryShape from "../models/Category";
 import ItemShape from "../models/Item";
-import ManufacturerShape from "../models/Manufacturer";
 import ProductShape from "../models/Product";
 import TransactionShape from "../models/Transaction";
 import { first } from "./entities";
@@ -9,16 +8,17 @@ import { first } from "./entities";
 import { LevenshteinDistance } from "./levenshteinDistance";
 import { measureRegExp } from './receipts';
 import { Locale, NameTranslations } from "./types";
+import BrandShape from "../models/Brand";
 
 export const getNumber = (value: string) => parseFloat(value.replace('−', '-').replace(',', '.'));
 
-export const getDetails = (manufacturers: ManufacturerShape[] = []) => {
+export const getDetails = (brands: BrandShape[] = []) => {
   const details: Record<string, Record<string, string[]>> = {};
 
-  details.manufacturers = {};
+  details.brands = {};
   
-  manufacturers.forEach(manufacturer => {
-    details.manufacturers[manufacturer.name] = [manufacturer.name, ...manufacturer.aliases || []];
+  brands.forEach(brand => {
+    details.brands[brand.name] = [brand.name, ...brand.aliases || []];
   });
 
   details.weighting = {
@@ -96,6 +96,7 @@ export const getDetails = (manufacturers: ManufacturerShape[] = []) => {
     vegan: ['vegaaninen', 'vegan'],
     fresh: ['fresh', 'tuore'],
     meal: ['meal', 'ateria'],
+    industrial: ['teollinen'],
     
     sweetorange: ['sweet orange'],
 
@@ -233,8 +234,8 @@ export function escapeRegExp(stringToGoIntoTheRegex: string) {
   return stringToGoIntoTheRegex.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
-export function stripName(name: NameTranslations, manufacturers: ManufacturerShape[]) {
-  const details = getDetails(manufacturers);
+export function stripName(name: NameTranslations, brands: BrandShape[]) {
+  const details = getDetails(brands);
   let strippedName: NameTranslations = {};
   Object.entries(name).forEach(([locale, translation]: [Locale, string]) => {
     strippedName[locale] = translation;
@@ -256,11 +257,11 @@ export function stripName(name: NameTranslations, manufacturers: ManufacturerSha
   return strippedName;
 }
 
-export function stripDetails(name: string, manufacturers: ManufacturerShape[] = []) {
+export function stripDetails(name: string, brands: BrandShape[] = []) {
   let token,
       accuracy;
 
-  const details = getDetails(manufacturers);
+  const details = getDetails(brands);
 
   let strippedName = name.replace(measureRegExp, '').replace(/[0-9.,]/g, '');
   for (let type in details) {
@@ -335,7 +336,7 @@ export const resolveCategories = async (
   items: ItemShape[] = [],
   products: ProductShape[] = [],
   categories: CategoryShape[] = [],
-  manufacturers: ManufacturerShape[] = []
+  brands: BrandShape[] = []
 ) => {
   try {
     console.log("items length", items.length);
@@ -346,7 +347,7 @@ export const resolveCategories = async (
       const trimmedCategory: CategoryShape & {trimmedName: NameTranslations} = {...category, trimmedName: {}};
       if (trimmedCategory.attributes.length) {
         let name = trimmedCategory.name;
-        trimmedCategory.trimmedName = stripName(name, manufacturers);
+        trimmedCategory.trimmedName = stripName(name, brands);
       } else {
         trimmedCategory.trimmedName = {};
       }
@@ -359,7 +360,7 @@ export const resolveCategories = async (
 
       const itemCategories: any[] = [];
       const itemProducts: any[] = [];
-      const trimmedItemName = stripDetails(item.product.name, manufacturers);
+      const trimmedItemName = stripDetails(item.product.name, brands);
       
       let distance: number;
 

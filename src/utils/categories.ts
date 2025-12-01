@@ -2,7 +2,6 @@ import moment from 'moment';
 
 import AttributeShape from '../models/Attribute';
 import CategoryShape from '../models/Category';
-import ManufacturerShape from '../models/Manufacturer';
 import { convertMeasure } from './entities';
 import { getTranslation } from '../utils/entities';
 import { stripName, stripDetails, getDetails } from './transactions';
@@ -14,6 +13,7 @@ import CategoryContributionShape from '../models/CategoryContribution';
 import { getAttributeValues, getMaxAttributeValue, getMinAttributeValue } from './attributes';
 import ProductShape from '../models/Product';
 import ItemShape from '../models/Item';
+import BrandShape from '../models/Brand';
 
 export const getAverageRate = (filter: {start_date: string, end_date: string}, averageRange: number) => {
   const {start_date, end_date} = filter;
@@ -240,10 +240,10 @@ export const resolveCategoryContributionPrices = (
 
 export const getStrippedCategories = (categories: (CategoryShape & {
   strippedName?: NameTranslations
-})[], manufacturers: ManufacturerShape[] = []) => {
+})[], brands: BrandShape[] = []) => {
   return categories.map(category => {
     const name = category.name;
-    category.strippedName = stripName(name, manufacturers);
+    category.strippedName = stripName(name, brands);
     return category;
   });
 };
@@ -425,13 +425,13 @@ export const getContributionsFromList = (
   return contributions;
 };
 
-export const getStrippedChildCategories = async (categories: CategoryShape[] = [], manufacturers: ManufacturerShape[] = []) => {
+export const getStrippedChildCategories = async (categories: CategoryShape[] = [], brands: BrandShape[] = []) => {
   //const categories = (await CategoryShape.query()
   //.withGraphFetched('[contributions, children, attributes]'));
 
   const childCategories = categories.filter(category => !category.children?.length);
   //const manufacturers = await ManufacturerShape.query();
-  const strippedCategories = getStrippedCategories(childCategories, manufacturers);
+  const strippedCategories = getStrippedCategories(childCategories, brands);
 
   return strippedCategories;
 };
@@ -502,11 +502,16 @@ export const getCategoryMinMaxAttributes = (
   return getCategoryMinMaxAttributesWithMeasure(category, measure, unit, attributeId, categories, categoryOwnAttributes, attributes);
 };
 
+export const getCategoryPortion = (
+  category: CategoryShape,
+  foodUnitAttribute: AttributeShape,
+) => category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
+
 export const getCategoryPortionMeasure = (
   category: CategoryShape,
   foodUnitAttribute: AttributeShape,
 ) => {
-  const portionAttribute = category.attributes.find(a => a.attributeId === foodUnitAttribute.id);
+  const portionAttribute = getCategoryPortion(category, foodUnitAttribute);
   return convertMeasure(portionAttribute?.value, portionAttribute?.unit, 'kg');
 };
 
