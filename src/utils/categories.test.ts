@@ -138,15 +138,15 @@ describe("categories utils", () => {
       mockAttributes[2]
     );
     const item = mockItems[1];
+    expect(item.price).toEqual(0.65);
+    const itemWeight = convertMeasure(item.measure, item.unit, 'kg');
+    expect(itemWeight).toEqual(0.5);
+    const contribution1Weight = convertMeasure(category.contributions[0].amount, category.contributions[0].unit, 'kg');
+    expect(contribution1Weight).toEqual(0.03);
+    const attributeWeight = convertMeasure(category.attributes[1].value, category.attributes[1].unit, 'kg');
+    expect(attributeWeight).toEqual(0.17500000000000002);
     expect(price).toEqual(
-      item.price / 
-      convertMeasure(item.measure, item.unit, 'kg') *
-      convertMeasure(category.contributions[0].amount, category.contributions[0].unit, 'kg') /
-      (
-        convertMeasure(category.contributions[0].amount, category.contributions[0].unit, 'kg') +
-        convertMeasure(category.contributions[1].amount, category.contributions[1].unit, 'kg')
-      ) *
-      convertMeasure(category.attributes[1].value, category.attributes[1].unit, 'kg')
+      (item.price / itemWeight) * contribution1Weight * attributeWeight
     );
   });
 });
