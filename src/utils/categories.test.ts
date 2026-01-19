@@ -1,6 +1,7 @@
 import { mockAttributes, mockCategories, mockCategoryChildren, mockItems, mockProducts } from '../setupTests';
 import {
   getCategoryMinMaxAttributes,
+  getClosestCategory,
   getContributionsFromList,
   getStrippedCategories,
   getTokensFromContributionList,
@@ -8,6 +9,7 @@ import {
   resolveCategoryContributionPrices,
 } from './categories';
 import { convertMeasure } from './entities';
+import { stripDetails } from './transactions';
 
 describe('categories utils', () => {
   it('should get tokens from contribution list', () => {
@@ -32,6 +34,14 @@ describe('categories utils', () => {
       'fi-FI': 'Pasta ravioli pinaatti',
       'sv-SE': 'Pasta fylld pasta ravioli med spenatfyllning',
     });
+  });
+
+  it('should get closest category', () => {
+    const strippedName = stripDetails('Fresh ravioli with spinach');
+    expect(strippedName).toEqual('ravioli spinach');
+    expect(getClosestCategory('Fresh ravioli with spinach', mockCategories, undefined, strippedName)[0]).toEqual(
+      mockCategories[4]
+    );
   });
 
   it('should get contributions', () => {
