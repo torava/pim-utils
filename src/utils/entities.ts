@@ -47,13 +47,13 @@ export const getParentWithFieldValue = <T extends { id: string; parentId?: strin
   }
 };
 
-export const getLeafIds = <T extends { id: string; parentId?: string }>(
+export const getLeafIds = <T extends { id?: number; parentId?: number }>(
   entities: T[],
-  parentId: string,
-  leafIds: string[] = []
+  parentId: number,
+  leafIds: number[] = []
 ) => {
   const children = entities.filter((entity) => entity.parentId === parentId);
-  let result: string[] = [];
+  let result: number[] = [];
   children.forEach((child) => {
     const childChildren = getLeafIds(entities, child.id, leafIds);
     if (!childChildren.length) {
