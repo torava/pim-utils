@@ -90,13 +90,13 @@ export const convertMeasure = (measure: number = 0, fromUnit?: string, toUnit?: 
 
 export const measureRegExp = /(\d{1,4}([.|,]\d)?)\s?((m|d|k)?(l|g)?)/;
 
-export const first = <T>(list: T[]) => {
+export const first = (list: Record<string, string>) => {
   for (let i in list) {
     return list[i];
   }
 };
 
-export const getTranslation = (name: any, locale: string, strict: boolean) => {
+export const getTranslation = (name: any, locale: string, strict = false) => {
   if (!name) {
     return name;
   }

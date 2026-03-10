@@ -1,4 +1,4 @@
-import { convertMeasure } from "./entities";
+import { convertMeasure } from './entities';
 
 describe('entities utils', () => {
   it('converts measure from ml to kg', () => {

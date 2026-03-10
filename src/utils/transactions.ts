@@ -27,7 +27,7 @@ export const getDetails = (brands: BrandShape[] = []) => {
 
 export function getNameLocale(name: string | NameTranslations, locale: Locale, strict?: boolean) {
   if (!name) {
-    return name;
+    return name as string;
   }
   if (typeof name === 'string') {
     return name;
