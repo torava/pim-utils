@@ -1,5 +1,8 @@
 image: node:24
 
+variables:
+  NPM_TOKEN: ${CI_JOB_TOKEN}
+
 stages:
   - deploy
 
