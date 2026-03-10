@@ -1,12 +1,15 @@
 {
   "name": "@torava/pim-utils",
-  "version": "1.2.11",
-  "description": "pim-utils",
+  "version": "1.2.12",
+  "description": "PIM utils",
   "scripts": {
     "test": "jest",
     "build": "npm run tsc",
     "tsc": "tsc"
   },
+  "files": [
+    "dist/"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {
