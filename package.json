@@ -5,14 +5,14 @@
   "scripts": {
     "test": "jest",
     "build": "npm run tsc",
-    "tsc": "./node_modules/.bin/tsc"
+    "tsc": "tsc"
   },
   "files": [
     "dist/"
   ],
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/torava/product-utils.git"
+    "url": "git+https://gitlab.com/torava/product-utils.git"
   },
   "author": "Teemu Orava",
   "license": "UNLICENSED",
