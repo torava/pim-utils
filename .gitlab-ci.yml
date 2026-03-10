@@ -26,6 +26,3 @@ publish:
     - npm publish
   only:
     - tags
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "main"'
-      when: always
