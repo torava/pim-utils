@@ -1,8 +1,3 @@
 # PIM Utils
 
-## Publishing
-```
-npm run build
-npm pack
-npm publish
-```
+PIM utility functions for [PIM API](https://github.com/torava/pim-api) and [PIM Tool](https://github.com/torava/pim-tool).
