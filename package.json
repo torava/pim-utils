@@ -1,15 +1,14 @@
 {
   "name": "@torava/pim-utils",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "description": "pim-utils",
   "scripts": {
     "test": "jest",
     "build": "npm run tsc",
     "tsc": "tsc"
   },
-  "files": [
-    "dist/"
-  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://gitlab.com/torava/product-utils.git"
