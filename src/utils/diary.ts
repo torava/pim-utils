@@ -74,12 +74,12 @@ export const compareAttributeToRecommendation = (value: number, recommendation: 
 export const compareMealPriceToRecommendation = (
   value: number,
   energy: number,
-  energyRecommendation: RecommendationShape
+  energyRecommendation?: RecommendationShape
 ) =>
   value <
-  (PRICE_RECOMMENDATION * energy) / convertMeasure(energyRecommendation.minValue, energyRecommendation.unit, 'kJ');
+  (PRICE_RECOMMENDATION * energy) / convertMeasure(energyRecommendation?.minValue, energyRecommendation?.unit, 'kJ');
 
-export const getRecommendation = (attribute: AttributeShape, sex: string, recommendations: RecommendationShape[]) => {
+export const getRecommendation = (attribute: AttributeShape, recommendations: RecommendationShape[], sex?: string) => {
   const attributeRecommendations = recommendations.filter(
     (recommendation) => recommendation.attributeId === attribute.id
   );
@@ -91,9 +91,9 @@ export const getRecommendation = (attribute: AttributeShape, sex: string, recomm
 
 export const getAttribute = (
   cellValue: string,
-  sex: string,
   attributes: AttributeShape[],
-  recommendations: RecommendationShape[]
+  recommendations: RecommendationShape[],
+  sex?: string
 ) =>
   cellValue &&
   attributes
@@ -104,5 +104,5 @@ export const getAttribute = (
           ([, value]) =>
             cellValue.match(/^((min|max)\.\s)?(.*)\s\((.*)\)(\s\[(.*)\])?$/i)?.[3].toLocaleLowerCase() ===
             value.toLocaleLowerCase()
-        ) && getRecommendation(attribute, sex, recommendations)
+        ) && getRecommendation(attribute, recommendations, sex)
     );
