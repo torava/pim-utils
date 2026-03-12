@@ -492,7 +492,17 @@ export const mockAttributes: AttributeShape[] = [
       "sv-SE": "medelstor portion"
     },
     "parentId": 2
-  }
+  },
+  {
+    id: 13,
+    code: 'CHOAVL',
+    name: {
+      'en-US': 'Carbohydrate, available',
+      'fi-FI': 'Hiilihydraatti imeytyvä',
+      'sv-SE': 'Kolhydrater, digererbara',
+    },
+    parentId: 12,
+  },
 ];
 
 export const mockItems: ItemShape[] = [
