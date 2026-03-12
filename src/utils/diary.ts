@@ -79,14 +79,17 @@ export const compareMealPriceToRecommendation = (
   value <
   (PRICE_RECOMMENDATION * energy) / convertMeasure(energyRecommendation?.minValue, energyRecommendation?.unit, 'kJ');
 
-export const getRecommendation = (attribute: AttributeShape, recommendations: RecommendationShape[], sex?: string) => {
-  const attributeRecommendations = recommendations.filter(
-    (recommendation) => recommendation.attributeId === attribute.id
-  );
-  const hasSex = attributeRecommendations.some((recommendation) => recommendation.sex);
-  return hasSex
-    ? attributeRecommendations.find((recommendation) => recommendation.sex === sex)
-    : attributeRecommendations[0];
+export const getRecommendation = (attribute?: AttributeShape, recommendations?: RecommendationShape[], sex?: string) => {
+  if (attribute && sex && recommendations) {
+    const attributeRecommendations = recommendations.filter(
+      (recommendation) => recommendation.attributeId === attribute.id
+    );
+    const hasSex = attributeRecommendations.some((recommendation) => recommendation.sex);
+    return hasSex
+      ? attributeRecommendations.find((recommendation) => recommendation.sex === sex)
+      : attributeRecommendations[0];
+  }
+  return;
 };
 
 export const getAttribute = (
