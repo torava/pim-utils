@@ -136,3 +136,9 @@ export const stringToSlug = (str: string, sep: string) => {
 
   return str;
 };
+
+export const hasChildren = (id?: number, rows: Record<string, string | number | null>[] = []) =>
+  id && rows.some((row) => row.parentId === id);
+
+export const getLeafEntities = <T extends { id?: number; parentId?: number }>(entities: T[]) =>
+  entities.filter((parent) => !hasChildren(parent.id, entities));
