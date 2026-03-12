@@ -26,7 +26,7 @@ export default interface RecommendationShape {
 	pal?: number;
 	note?: string;
 
-	attribute: AttributeShape;
+	attribute?: AttributeShape;
 	attributeId: AttributeShape['id'];
   sources?: RecommendationSourceShape[];
 }

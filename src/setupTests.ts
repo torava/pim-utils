@@ -2,6 +2,7 @@ import AttributeShape from "./models/Attribute";
 import CategoryShape from "./models/Category";
 import ItemShape from "./models/Item";
 import ProductShape from "./models/Product";
+import RecommendationShape from "./models/Recommendation";
 
 export const toArrayBuffer = (buffer: Buffer) => {
   const arrayBuffer = new ArrayBuffer(buffer.length);
@@ -546,4 +547,22 @@ export const mockProducts: ProductShape[] = [
     ],
     categoryId: 296
   }
+];
+
+export const mockRecommendations: RecommendationShape[] = [
+  {
+    id: 7,
+    minValue: 45,
+    maxValue: 60,
+    unit: 'percent',
+    perUnit: 'energy',
+    minimumAge: null,
+    maximumAge: null,
+    sex: null,
+    weight: null,
+    pav: null,
+    pal: null,
+    note: '',
+    attributeId: 13,
+  },
 ];
