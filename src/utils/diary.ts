@@ -25,20 +25,22 @@ export const getAttributeValue = (
   recommendation: RecommendationShape,
   attribute: AttributeShape
 ) => {
-  let value;
-  if (recommendation.unit === 'percent' && recommendation.perUnit === 'energy') {
-    const componentEnergy = Object.entries(componentEnergyMap).find(([component]) =>
-      attribute.name['en-US'].toLocaleLowerCase().includes(component)
-    )?.[1];
-    value = ((cellValue * componentEnergy) / (energy / 1000)) * 100;
-  } else if (recommendation.unit === 'g' && recommendation.perUnit === 'MJ') {
-    value = cellValue / (energy / 1000);
-  } else if (recommendation.perUnit === 'kg') {
-    value = cellValue / (mass / 1000);
-  } else if (recommendation.unit === 'MJ') {
-    value = cellValue / 1000;
+  if (recommendation && attribute) {
+    let value;
+    if (recommendation.unit === 'percent' && recommendation.perUnit === 'energy') {
+      const componentEnergy = Object.entries(componentEnergyMap).find(([component]) =>
+        attribute.name['en-US'].toLocaleLowerCase().includes(component)
+      )?.[1];
+      value = ((cellValue * componentEnergy) / (energy / 1000)) * 100;
+    } else if (recommendation.unit === 'g' && recommendation.perUnit === 'MJ') {
+      value = cellValue / (energy / 1000);
+    } else if (recommendation.perUnit === 'kg') {
+      value = cellValue / (mass / 1000);
+    } else if (recommendation.unit === 'MJ') {
+      value = cellValue / 1000;
+    }
+    return value;
   }
-  return value;
 };
 
 export const getDailyAttributeValue = (
