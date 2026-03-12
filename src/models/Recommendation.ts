@@ -18,14 +18,15 @@ export default interface RecommendationShape {
 	maxValue: number;
   unit: string;
 	perUnit: string;
-	minimumAge: number;
-	maximumAge: number;
-	sex: Sex;
-	weight: number;
-	pav: boolean;
-	pal: number;
-	note: string;
+	minimumAge?: number;
+	maximumAge?: number;
+	sex?: Sex;
+	weight?: number;
+	pav?: boolean;
+	pal?: number;
+	note?: string;
 
+	attribute: AttributeShape;
 	attributeId: AttributeShape['id'];
   sources?: RecommendationSourceShape[];
 }
