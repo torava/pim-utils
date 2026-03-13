@@ -58,8 +58,8 @@ export const getDailyAttributeValue = (
 export const getMealAttributeValue = (
   cellValue: number,
   energy: number,
-  energyRecommendation: RecommendationShape,
   mass: number,
+  energyRecommendation: RecommendationShape,
   recommendation: RecommendationShape,
   attribute: AttributeShape
 ) => {
