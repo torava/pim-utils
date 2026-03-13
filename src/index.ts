@@ -1,5 +1,6 @@
 export * from './utils/entities';
 export * from './utils/diary';
+export * from './utils/types';
 
 export type * from './models/Attribute';
 export type * from './models/Brand';
