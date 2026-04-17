@@ -29,9 +29,9 @@ export const getAttributeValue = (
     let value;
     if (recommendation.unit === 'percent' && recommendation.perUnit === 'energy') {
       const componentEnergy = Object.entries(componentEnergyMap).find(([component]) =>
-        attribute.name['en-US'].toLocaleLowerCase().includes(component)
+        attribute.name?.['en-US']?.toLocaleLowerCase().includes(component)
       )?.[1];
-      value = ((cellValue * componentEnergy) / (energy / 1000)) * 100;
+      value = ((cellValue * (componentEnergy || 0)) / (energy / 1000)) * 100;
     } else if (recommendation.unit === 'g' && recommendation.perUnit === 'MJ') {
       value = cellValue / (energy / 1000);
     } else if (recommendation.perUnit === 'kg') {
@@ -105,7 +105,7 @@ export const getAttribute = (
     .filter((attribute) => attribute.parentId !== FOOD_UNITS_ID)
     .find(
       (attribute) =>
-        Object.entries(attribute.name).find(
+        Object.entries(attribute.name || {}).find(
           ([, value]) =>
             cellValue.match(/^((min|max)\.\s)?(.*)\s\((.*)\)(\s\[(.*)\])?$/i)?.[3].toLocaleLowerCase() ===
             value.toLocaleLowerCase()

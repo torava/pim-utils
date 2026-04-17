@@ -22,25 +22,28 @@ const factors: Record<string, number> = {
   Y: 24,
 };
 
-export const getRootEntity = <T extends { id: string; parentId?: string }>(entities: T[], parentId: string): T => {
+export const getRootEntity = <T extends { id: string; parentId?: string }>(
+  entities: T[],
+  parentId?: string
+): T | undefined => {
   if (!parentId) return;
 
   const parent = entities.find((entity) => entity.id === parentId);
 
-  const parentsParent = getRootEntity(entities, parent.parentId);
+  const parentsParent = getRootEntity(entities, parent?.parentId);
 
   return parentsParent || parent;
 };
 
 export const getParentWithFieldValue = <T extends { id: string; parentId?: string }>(
   entities: T[],
-  parentId: string,
+  parentId: string | undefined,
   field: keyof T,
   value: T[keyof T]
-): T => {
+): T | undefined => {
   if (!parentId) return;
   const parent = entities.find((entity) => entity.id === parentId);
-  if (parent[field] === value) {
+  if (parent?.[field] === value) {
     return parent;
   } else {
     return getParentWithFieldValue(entities, parent?.parentId, field, value);
@@ -49,17 +52,17 @@ export const getParentWithFieldValue = <T extends { id: string; parentId?: strin
 
 export const getLeafIds = <T extends { id?: number; parentId?: number }>(
   entities: T[],
-  parentId: number,
+  parentId: number | undefined,
   leafIds: number[] = []
 ) => {
   const children = entities.filter((entity) => entity.parentId === parentId);
   let result: number[] = [];
   children.forEach((child) => {
     const childChildren = getLeafIds(entities, child.id, leafIds);
-    if (!childChildren.length) {
+    if (!childChildren.length && child.id) {
       leafIds.push(child.id);
     }
-    result.push(child.id);
+    if (child.id) result.push(child.id);
     result = result.concat(childChildren);
   });
   return result;
