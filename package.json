@@ -1,6 +1,6 @@
 {
   "name": "@torava/pim-utils",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "PIM utils",
   "scripts": {
     "test": "jest",

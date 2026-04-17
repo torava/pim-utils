@@ -1,12 +1,12 @@
 {
   "name": "@torava/pim-utils",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
       "name": "@torava/pim-utils",
-      "version": "1.6.3",
+      "version": "1.6.4",
       "license": "UNLICENSED",
       "dependencies": {
         "classnames": "^2.2.6",
