@@ -137,7 +137,7 @@ export const stringToSlug = (str: string, sep: string) => {
   return str;
 };
 
-export const hasChildren = (id?: number, rows: Record<string, string | number | null>[] = []) =>
+export const hasChildren = <T extends { parentId?: number }>(id?: number, rows: T[] = []) =>
   id && rows.some((row) => row.parentId === id);
 
 export const getLeafEntities = <T extends { id?: number; parentId?: number }>(entities: T[]) =>
