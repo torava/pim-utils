@@ -1,6 +1,6 @@
-import AttributeShape from "../models/Attribute";
-import RecommendationShape from "../models/Recommendation";
-import { convertMeasure } from "./entities";
+import AttributeShape from '../models/Attribute';
+import RecommendationShape from '../models/Recommendation';
+import { convertMeasure } from './entities';
 
 /**
  * Food component energy density, MJ/g
@@ -81,7 +81,11 @@ export const compareMealPriceToRecommendation = (
   value <
   (PRICE_RECOMMENDATION * energy) / convertMeasure(energyRecommendation?.minValue, energyRecommendation?.unit, 'kJ');
 
-export const getRecommendation = (attribute?: AttributeShape, recommendations?: RecommendationShape[], sex?: string) => {
+export const getRecommendation = (
+  attribute?: AttributeShape,
+  recommendations?: RecommendationShape[],
+  sex?: string
+) => {
   if (attribute && sex && recommendations) {
     const attributeRecommendations = recommendations.filter(
       (recommendation) => recommendation.attributeId === attribute.id
