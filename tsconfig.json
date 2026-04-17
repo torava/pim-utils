@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
+    "rootDir": "src",
     "outDir": "dist/",
     "noImplicitAny": true,
-    "module": "CommonJS",
+    "module": "nodenext",
     "lib": ["es2020"],
-    "target": "es5",
+    "target": "esnext",
     "jsx": "react",
     "allowJs": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "declaration": true,
